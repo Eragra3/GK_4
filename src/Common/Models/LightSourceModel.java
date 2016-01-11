@@ -4,13 +4,13 @@ package Common.Models;
  * Created by bider_000 on 10.01.2016.
  */
 public class LightSourceModel {
-    public double x = 100;
-    public double y = 100;
-    public double z = 0;
+    public double x;
+    public double y;
+    public double z;
 
-    public int r = 127;
-    public int g = 127;
-    public int b = 127;
+    public int r;
+    public int g;
+    public int b;
 
     public LightSourceModel(double x, double y, double z, int r, int g, int b) {
         this.x = x;

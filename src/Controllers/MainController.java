@@ -1,6 +1,8 @@
 package Controllers;
 
 import Common.Configuration;
+import Common.Models.LightSourceModel;
+import Common.Models.ObserverModel;
 import Common.Models.TriangleModel;
 import Common.Models.Vertex3DModel;
 import OBJReader.OBJReader;
@@ -9,7 +11,6 @@ import Renderers.PerspectiveRenderer;
 import Renderers.XOYRenderer;
 import Renderers.XOZRenderer;
 import Renderers.YOZRenderer;
-import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -18,12 +19,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
-import jdk.nashorn.internal.runtime.regexp.joni.Config;
+import javafx.scene.paint.Color;
 
 import javax.swing.*;
 import java.net.URL;
 import java.util.*;
-import java.util.Timer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -175,10 +175,14 @@ public class MainController implements Initializable {
 //        perspectiveTask.start();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(() -> {
-            xoyRenderer.render();
-            xozRenderer.render();
-            yozRenderer.render();
-            perspectiveRenderer.render();
+//            try {
+                xoyRenderer.render();
+                xozRenderer.render();
+                yozRenderer.render();
+                perspectiveRenderer.render();
+//            } catch (Exception e){
+//                e.printStackTrace();
+//            }
         }, 1000, 100, TimeUnit.MILLISECONDS);
 //        Timer timer = new Timer("Main Timer", true);
 //        TimerTask renderersTask = new TimerTask() {
@@ -217,42 +221,25 @@ public class MainController implements Initializable {
         cCameraAxis.setWidth(Configuration.IMAGE_WIDTH);
 
         pwAxisXOY = cXOYAxis.getGraphicsContext2D().getPixelWriter();
-        paintAxis(cXOYAxis);
-        cXOYAxis.getGraphicsContext2D().strokeText("XOY", 10, 10);
-        cXOYAxis.getGraphicsContext2D().strokeText("X", 390, 215);
-        cXOYAxis.getGraphicsContext2D().strokeText("Y", 205, 15);
+
         pwAxisXOZ = cXOZAxis.getGraphicsContext2D().getPixelWriter();
-        paintAxis(cXOZAxis);
-        cXOZAxis.getGraphicsContext2D().strokeText("XOZ", 10, 10);
-        cXOZAxis.getGraphicsContext2D().strokeText("Z", 205, 15);
-        cXOZAxis.getGraphicsContext2D().strokeText("X", 390, 215);
+
         pwAxisYOZ = cYOZAxis.getGraphicsContext2D().getPixelWriter();
-        paintAxis(cYOZAxis);
-        cYOZAxis.getGraphicsContext2D().strokeText("YOZ", 10, 10);
-        cYOZAxis.getGraphicsContext2D().strokeText("Z", 205, 15);
-        cYOZAxis.getGraphicsContext2D().strokeText("Y", 390, 215);
+
         pwAxisCamera = cCameraAxis.getGraphicsContext2D().getPixelWriter();
-        paintAxis(cCameraAxis);
         cCameraAxis.getGraphicsContext2D().strokeText("Perspective", 10, 10);
 //        cCameraAxis.getGraphicsContext2D().strokeText("X", 205, 15);
 //        cCameraAxis.getGraphicsContext2D().strokeText("Y", 390, 215);
-        renderObserver();
+        renderOverlays();
     }
 
     @FXML
     public void readFile() {
         OBJReader reader = new OBJReader();
         reader.setScale(Configuration.objectScale);
-        OBJResponse response = reader.readFile("round_roof.obj");
+        OBJResponse response = reader.readFile("sphere.obj");
         vertices = response.vertices;
         triangles = response.triangles;
-    }
-
-    private void paintAxis(Canvas canvas) {
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        PixelWriter pw = gc.getPixelWriter();
-        pw.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, PixelFormat.getIntArgbInstance(), axisPixelData, 0,
-                Configuration.IMAGE_WIDTH);
     }
 
     private void bindListeners() {
@@ -278,6 +265,13 @@ public class MainController implements Initializable {
             else
                 labelAngleY.setText(newValue.toString().substring(0, 4));
         });
+        tFObserverX.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFObserverX.setText(String.valueOf(Double.parseDouble(tFObserverX.getText()) + 1));
+                    else
+                        tFObserverX.setText(String.valueOf(Double.parseDouble(tFObserverX.getText()) - 1));
+                }
+        );
         tFObserverX.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -285,10 +279,18 @@ public class MainController implements Initializable {
                     Configuration.observer.x = value;
                     labelObserverX.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        tFObserverY.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFObserverY.setText(String.valueOf(Double.parseDouble(tFObserverY.getText()) + 1));
+                    else
+                        tFObserverY.setText(String.valueOf(Double.parseDouble(tFObserverY.getText()) - 1));
+                }
+        );
         tFObserverY.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -296,10 +298,18 @@ public class MainController implements Initializable {
                     Configuration.observer.y = value;
                     labelObserverY.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        tFObserverZ.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFObserverZ.setText(String.valueOf(Double.parseDouble(tFObserverZ.getText()) + 1));
+                    else
+                        tFObserverZ.setText(String.valueOf(Double.parseDouble(tFObserverZ.getText()) - 1));
+                }
+        );
         tFObserverZ.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -307,6 +317,7 @@ public class MainController implements Initializable {
                     Configuration.observer.z = value;
                     labelObserverZ.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
@@ -318,6 +329,7 @@ public class MainController implements Initializable {
                     Configuration.lightSource.x = value;
                     labelLightX.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
@@ -329,6 +341,7 @@ public class MainController implements Initializable {
                     Configuration.lightSource.y = value;
                     labelLightY.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
@@ -340,13 +353,52 @@ public class MainController implements Initializable {
                     Configuration.lightSource.z = value;
                     labelLightZ.setText(String.valueOf(value));
                     perspectiveRenderer.reloadData();
+                    renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
     }
 
-    private final void renderObserver() {
-//        cXOYAxis.
+    private final void renderOverlays() {
+        ObserverModel o = Configuration.observer;
+        LightSourceModel l = Configuration.lightSource;
+
+
+        pwAxisXOY.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, PixelFormat.getIntArgbInstance(), axisPixelData, 0,
+                Configuration.IMAGE_WIDTH);
+        GraphicsContext gcXOY = cXOYAxis.getGraphicsContext2D();
+        gcXOY.setFill(Color.GREEN);
+        gcXOY.fillRect(o.x + Configuration.IMAGE_WIDTH_HALF - 4, -o.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.setFill(Color.VIOLET);
+        gcXOY.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.strokeText("XOY", 10, 10);
+        gcXOY.strokeText("X", 390, 215);
+        gcXOY.strokeText("Y", 205, 15);
+
+
+        pwAxisXOZ.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, PixelFormat.getIntArgbInstance(), axisPixelData, 0,
+                Configuration.IMAGE_WIDTH);
+        GraphicsContext gcXOZ = cXOZAxis.getGraphicsContext2D();
+        gcXOZ.setFill(Color.GREEN);
+        gcXOZ.fillRect(o.x + Configuration.IMAGE_WIDTH_HALF - 4, -o.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOZ.setFill(Color.VIOLET);
+        gcXOZ.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOZ.strokeText("XOZ", 10, 10);
+        gcXOZ.strokeText("Z", 205, 15);
+        gcXOZ.strokeText("X", 390, 215);
+
+
+        pwAxisYOZ.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, PixelFormat.getIntArgbInstance(), axisPixelData, 0,
+                Configuration.IMAGE_WIDTH);
+        GraphicsContext gcYOZ = cYOZAxis.getGraphicsContext2D();
+        gcYOZ.setFill(Color.GREEN);
+        gcYOZ.fillRect(o.y + Configuration.IMAGE_WIDTH_HALF - 4, -o.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcYOZ.setFill(Color.VIOLET);
+        gcYOZ.fillRect(l.y + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcYOZ.strokeText("YOZ", 10, 10);
+        gcYOZ.strokeText("Z", 205, 15);
+        gcYOZ.strokeText("Y", 390, 215);
+
     }
 }

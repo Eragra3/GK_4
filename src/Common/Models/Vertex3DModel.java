@@ -11,10 +11,6 @@ public class Vertex3DModel {
     public double y;
     public double z;
 
-    public double projX;
-    public double projY;
-    public double projDistance;
-
     public int a = 255;
     public int r = 255;
     public int g = 0;
@@ -27,8 +23,6 @@ public class Vertex3DModel {
     public double ks = 0.5;
     public double kd = 0.5;
     public double ka = 0.5;
-
-    public List<TriangleModel> triangles = new ArrayList<>(10);
 
     public Vertex3DModel(double x, double y, double z) {
         this.x = x;
