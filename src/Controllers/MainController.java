@@ -9,6 +9,7 @@ import Renderers.PerspectiveRenderer;
 import Renderers.XOYRenderer;
 import Renderers.XOZRenderer;
 import Renderers.YOZRenderer;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -23,6 +24,9 @@ import javax.swing.*;
 import java.net.URL;
 import java.util.*;
 import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MainController implements Initializable {
 
@@ -44,9 +48,16 @@ public class MainController implements Initializable {
     Canvas cYOZAxis;
     @FXML
     Canvas cCameraAxis;
+    //
+
+    //pixel writers
+    PixelWriter pwAxisCamera;
+    PixelWriter pwAxisXOY;
+    PixelWriter pwAxisXOZ;
+    PixelWriter pwAxisYOZ;
+    //
 
     int[] axisPixelData = new int[Configuration.IMAGE_WIDTH * Configuration.IMAGE_HEIGHT];
-    //
 
     //CONTROLS
     @FXML
@@ -131,47 +142,57 @@ public class MainController implements Initializable {
         cXOY.setHeight(Configuration.IMAGE_HEIGHT);
         cXOY.setWidth(Configuration.IMAGE_WIDTH);
         GraphicsContext xoyGC = cXOY.getGraphicsContext2D();
-        PixelWriter xoyPW = xoyGC.getPixelWriter();
-        xoyRenderer = new XOYRenderer(vertices, triangles, xoyPW);
+        PixelWriter pwXOY = xoyGC.getPixelWriter();
+        xoyRenderer = new XOYRenderer(vertices, triangles, pwXOY);
 
         cXOZ.setHeight(Configuration.IMAGE_HEIGHT);
         cXOZ.setWidth(Configuration.IMAGE_WIDTH);
         GraphicsContext xozGC = cXOZ.getGraphicsContext2D();
-        PixelWriter xozPW = xozGC.getPixelWriter();
-        xozRenderer = new XOZRenderer(vertices, triangles, xozPW);
+        PixelWriter pwXOZ = xozGC.getPixelWriter();
+        xozRenderer = new XOZRenderer(vertices, triangles, pwXOZ);
 
         cYOZ.setHeight(Configuration.IMAGE_HEIGHT);
         cYOZ.setWidth(Configuration.IMAGE_WIDTH);
         GraphicsContext yozGC = cYOZ.getGraphicsContext2D();
-        PixelWriter yozPW = yozGC.getPixelWriter();
-        yozRenderer = new YOZRenderer(vertices, triangles, yozPW);
+        PixelWriter pwYOZ = yozGC.getPixelWriter();
+        yozRenderer = new YOZRenderer(vertices, triangles, pwYOZ);
 
         cCamera.setHeight(Configuration.IMAGE_HEIGHT);
         cCamera.setWidth(Configuration.IMAGE_WIDTH);
         GraphicsContext cGC = cCamera.getGraphicsContext2D();
-        PixelWriter cPW = cGC.getPixelWriter();
-        perspectiveRenderer = new PerspectiveRenderer(vertices, triangles, cPW);
+        PixelWriter pwC = cGC.getPixelWriter();
+        perspectiveRenderer = new PerspectiveRenderer(vertices, triangles, pwC);
 //        cCamera.setHeight(Configuration.IMAGE_HEIGHT);
 //        cCamera.setWidth(Configuration.IMAGE_WIDTH);
 //        GraphicsContext xoyGC = cXOY.getGraphicsContext2D();
 //        PixelWriter xoyPW = xoyGC.getPixelWriter();
 //        cameraRenderer = new XOYRenderer(vertices, triangles, xoyPW);
 
-
-        Timer timer = new Timer("Main Timer");
-
-        TimerTask renderersTask = new TimerTask() {
-            @Override
-            public void run() {
-
-                xoyRenderer.render();
-                xozRenderer.render();
-                yozRenderer.render();
-                perspectiveRenderer.render();
-            }
-        };
-
-        timer.scheduleAtFixedRate(renderersTask, 0L, 100L);
+//        Thread perspectiveTask = new Thread(() -> {
+//            while (!Thread.currentThread().isInterrupted())
+//                perspectiveRenderer.render();
+//        });
+//        perspectiveTask.start();
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleWithFixedDelay(() -> {
+            xoyRenderer.render();
+            xozRenderer.render();
+            yozRenderer.render();
+            perspectiveRenderer.render();
+        }, 1000, 100, TimeUnit.MILLISECONDS);
+//        Timer timer = new Timer("Main Timer", true);
+//        TimerTask renderersTask = new TimerTask() {
+//            @Override
+//            public void run() {
+//                if (!Thread.currentThread().isInterrupted()) {
+//                    xoyRenderer.render();
+//                    xozRenderer.render();
+//                    yozRenderer.render();
+//                    perspectiveRenderer.render();
+//                }
+//            }
+//        };
+//        timer.scheduleAtFixedRate(renderersTask, 0L, 100L);
 
         for (int i = 0; i < Configuration.IMAGE_WIDTH; i += 2) {
             axisPixelData[i + 200 * Configuration.IMAGE_WIDTH] = 0xff0000ff;
@@ -195,29 +216,34 @@ public class MainController implements Initializable {
         cCameraAxis.setHeight(Configuration.IMAGE_HEIGHT);
         cCameraAxis.setWidth(Configuration.IMAGE_WIDTH);
 
+        pwAxisXOY = cXOYAxis.getGraphicsContext2D().getPixelWriter();
         paintAxis(cXOYAxis);
         cXOYAxis.getGraphicsContext2D().strokeText("XOY", 10, 10);
-        cXOYAxis.getGraphicsContext2D().strokeText("X", 205, 15);
-        cXOYAxis.getGraphicsContext2D().strokeText("Y", 390, 215);
+        cXOYAxis.getGraphicsContext2D().strokeText("X", 390, 215);
+        cXOYAxis.getGraphicsContext2D().strokeText("Y", 205, 15);
+        pwAxisXOZ = cXOZAxis.getGraphicsContext2D().getPixelWriter();
         paintAxis(cXOZAxis);
         cXOZAxis.getGraphicsContext2D().strokeText("XOZ", 10, 10);
-        cXOZAxis.getGraphicsContext2D().strokeText("X", 205, 15);
-        cXOZAxis.getGraphicsContext2D().strokeText("Z", 390, 215);
+        cXOZAxis.getGraphicsContext2D().strokeText("Z", 205, 15);
+        cXOZAxis.getGraphicsContext2D().strokeText("X", 390, 215);
+        pwAxisYOZ = cYOZAxis.getGraphicsContext2D().getPixelWriter();
         paintAxis(cYOZAxis);
         cYOZAxis.getGraphicsContext2D().strokeText("YOZ", 10, 10);
-        cYOZAxis.getGraphicsContext2D().strokeText("Y", 205, 15);
-        cYOZAxis.getGraphicsContext2D().strokeText("Z", 390, 215);
+        cYOZAxis.getGraphicsContext2D().strokeText("Z", 205, 15);
+        cYOZAxis.getGraphicsContext2D().strokeText("Y", 390, 215);
+        pwAxisCamera = cCameraAxis.getGraphicsContext2D().getPixelWriter();
         paintAxis(cCameraAxis);
         cCameraAxis.getGraphicsContext2D().strokeText("Perspective", 10, 10);
 //        cCameraAxis.getGraphicsContext2D().strokeText("X", 205, 15);
 //        cCameraAxis.getGraphicsContext2D().strokeText("Y", 390, 215);
+        renderObserver();
     }
 
     @FXML
     public void readFile() {
         OBJReader reader = new OBJReader();
         reader.setScale(Configuration.objectScale);
-        OBJResponse response = reader.readFile("toruses.obj");
+        OBJResponse response = reader.readFile("round_roof.obj");
         vertices = response.vertices;
         triangles = response.triangles;
     }
@@ -318,5 +344,9 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+    }
+
+    private final void renderObserver() {
+//        cXOYAxis.
     }
 }

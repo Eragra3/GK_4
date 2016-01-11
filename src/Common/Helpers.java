@@ -54,4 +54,28 @@ public class Helpers {
     public final static double dotProduct(Vector3DModel v1, Vector3DModel v2) {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
     }
+
+    public final static void resetZBuffer(double[][] zBuffer) {
+        for (double[] column : zBuffer) {
+            for (int i = 0; i < column.length; i++) {
+                column[i] = Double.MAX_VALUE;
+            }
+        }
+    }
+
+    public final static void resetZBuffer(double[] zBuffer) {
+        for (int i = 0; i < zBuffer.length; i++) {
+            zBuffer[i] = Double.MAX_VALUE;
+        }
+    }
+
+    public final static void resetPixelDataToWhite(byte[] pixelData) {
+        for (int i = 0; i < pixelData.length; i++)
+            pixelData[i] = -1;
+    }
+
+    public final static void resetPixelDataToWhite(int[] pixelData) {
+        for (int i = 0; i < pixelData.length; i++)
+            pixelData[i] = 0xffffffff;
+    }
 }

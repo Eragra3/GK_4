@@ -22,9 +22,9 @@ public class XOZRenderer implements IRenderer {
     PixelWriter pixelWriter;
 
 
-    byte[] pixelData = new byte[Configuration.IMAGE_HEIGHT * Configuration.IMAGE_WIDTH * 3];
+    int[] pixelData = new int[Configuration.IMAGE_HEIGHT * Configuration.IMAGE_WIDTH];
 
-    double[][] zBuffer = new double[Configuration.IMAGE_WIDTH][Configuration.IMAGE_HEIGHT];
+    double[] zBuffer = new double[Configuration.IMAGE_WIDTH * Configuration.IMAGE_HEIGHT];
 
     public XOZRenderer(ArrayList<Vertex3DModel> vertices, ArrayList<TriangleModel> triangles, PixelWriter pixelWriter) {
         this.vertices = vertices;
@@ -34,14 +34,14 @@ public class XOZRenderer implements IRenderer {
 
 
     public void render() {
-        for (int i = 0; i < Helpers.zBufferInitial.length; i++)
-            zBuffer[i] = Helpers.zBufferInitial[i].clone();
+        Helpers.resetZBuffer(zBuffer);
 
-        System.arraycopy(Helpers.whitePixelsData, 0, pixelData, 0, Helpers.whitePixelsData.length);
+        Helpers.resetPixelDataToWhite(pixelData);
 
         double x, x0, x1, z, z0, z1, t0, t1, dist;
         double dot00, dot01, dot02, dot11, dot12, invDenom;
         int tempI, tempJ;
+        int alpha, red, green, blue;
 
         //bounding box
         Point2D tl;
@@ -86,12 +86,20 @@ public class XOZRenderer implements IRenderer {
                             dist = Math.abs(Configuration.observer.y - (model.a.y * t0 + model.b.y * t1 + model.c.y * (1 - t0 -
                                     t1)));
                             tempI = i + Configuration.IMAGE_WIDTH_HALF;
-                            tempJ = j + Configuration.IMAGE_HEIGHT_HALF;
-                            if (dist < zBuffer[tempI][tempJ]) {
-                                zBuffer[tempI][tempJ] = dist;
-                                pixelData[(tempI * Configuration.IMAGE_WIDTH + tempJ) * 3] = model.rC;
-                                pixelData[(tempI * Configuration.IMAGE_WIDTH + tempJ) * 3 + 1] = model.gC;
-                                pixelData[(tempI * Configuration.IMAGE_WIDTH + tempJ) * 3 + 2] = model.bC;
+                            //JAVAFX y coordinate grows downwards, hence minus sign
+                            tempJ = -j + Configuration.IMAGE_HEIGHT_HALF;
+                            if (dist < zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI]) {
+                                zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI] = dist;
+
+                                //lighting
+//                                alpha = (int) (model.a.a * t0 + model.b.a * t1 + model.c.a * (1 - t0 - t1));
+                                alpha = 255;
+                                red = (int) (model.a.r * t0 + model.b.r * t1 + model.c.r * (1 - t0 - t1));
+                                green = (int) (model.a.g * t0 + model.b.g * t1 + model.c.g * (1 - t0 - t1));
+                                blue = (int) (model.a.b * t0 + model.b.b * t1 + model.c.b * (1 - t0 - t1));
+                                //
+
+                                pixelData[tempJ * Configuration.IMAGE_WIDTH - tempI] = (alpha << 24) + (red << 16) + (green << 8) + blue;
                             }
                         }
                     }
@@ -99,8 +107,8 @@ public class XOZRenderer implements IRenderer {
             }
         }
 
-        pixelWriter.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, Configuration.pixelRGBFormat,
-                pixelData, 0, Configuration.IMAGE_WIDTH * 3);
+        pixelWriter.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, Configuration.pixelARGBFormat,
+                pixelData, 0, Configuration.IMAGE_WIDTH);
     }
 
 }

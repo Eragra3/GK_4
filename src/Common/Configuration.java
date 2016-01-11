@@ -16,10 +16,11 @@ public class Configuration {
     public static final int IMAGE_HEIGHT_HALF = IMAGE_HEIGHT / 2;
 
     public final static PixelFormat pixelRGBFormat = PixelFormat.getByteRgbInstance();
+    public final static PixelFormat pixelARGBFormat = PixelFormat.getIntArgbInstance();
 
     private static int OBSERVER_X = 0;
-    private static int OBSERVER_Y = 000;
-    private static int OBSERVER_Z = 10;
+    private static int OBSERVER_Y = 0;
+    private static int OBSERVER_Z = -100;
     private static double OBSERVER_ANGLE_X = 60.0;
     private static double OBSERVER_ANGLE_Y = 60.0;
     public static ObserverModel observer = new ObserverModel(OBSERVER_X, OBSERVER_Y, OBSERVER_Z, OBSERVER_ANGLE_X, OBSERVER_ANGLE_Y);

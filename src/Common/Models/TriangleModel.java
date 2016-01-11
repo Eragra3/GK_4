@@ -18,7 +18,7 @@ public class TriangleModel {
     public double kd = 1;
     public double ka = 1;
 
-    public byte opacity = 0;
+    public byte alpha = -1;
     public byte rC = 0;
     public byte gC = 0;
     public byte bC = 0;
@@ -38,6 +38,6 @@ public class TriangleModel {
     }
 
     public int getColor() {
-        return (opacity << 24) + (rC << 16) + (gC << 8) + (bC);
+        return (alpha << 24) + (rC << 16) + (gC << 8) + (bC);
     }
 }
