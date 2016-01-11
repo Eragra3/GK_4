@@ -1,15 +1,82 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Slider?>
 <StackPane fx:controller="Controllers.MainController"
            xmlns:fx="http://javafx.com/fxml" alignment="center">
-    <VBox>
+    <HBox>
         <GridPane hgap="10" vgap="10">
-            <ImageView GridPane.rowIndex="1" GridPane.columnIndex="1" fx:id="ivXOZ"></ImageView>
-            <Canvas GridPane.rowIndex="1" GridPane.columnIndex="2" fx:id="cXOY"></Canvas>
-            <ImageView GridPane.rowIndex="2" GridPane.columnIndex="1" fx:id="ivYOZ"></ImageView>
-            <ImageView GridPane.rowIndex="2" GridPane.columnIndex="2" fx:id="ivCamera"></ImageView>
+            <StackPane GridPane.rowIndex="1" GridPane.columnIndex="1"
+                       style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style: solid;">
+                <Canvas fx:id="cCamera"></Canvas>
+                <Canvas fx:id="cCameraAxis"></Canvas>
+            </StackPane>
+            <StackPane GridPane.rowIndex="1" GridPane.columnIndex="2"
+                       style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style: solid;">
+                <Canvas fx:id="cXOY"></Canvas>
+                <Canvas fx:id="cXOYAxis"></Canvas>
+            </StackPane>
+            <StackPane GridPane.rowIndex="2" GridPane.columnIndex="1"
+                       style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style: solid;">
+                <Canvas fx:id="cXOZ"></Canvas>
+                <Canvas fx:id="cXOZAxis"></Canvas>
+            </StackPane>
+            <StackPane GridPane.rowIndex="2" GridPane.columnIndex="2"
+                       style="-fx-border-color:black; -fx-border-width: 1; -fx-border-style: solid;">
+                <Canvas fx:id="cYOZ"></Canvas>
+                <Canvas fx:id="cYOZAxis"></Canvas>
+            </StackPane>
         </GridPane>
-        <HBox></HBox>
-    </VBox>
+        <VBox spacing="5">
+            <padding><Insets top="10" left="10" right="10" bottom="10"></Insets></padding>
+            <HBox spacing="5">
+                <Label>Show axises</Label>
+                <CheckBox fx:id="chBShowAxis" selected="true"></CheckBox>
+            </HBox>
+            <HBox spacing="5">
+                <Label>FOV x</Label>
+                <Slider fx:id="sFOVX" min="1" max="89"></Slider>
+                <Label fx:id="labelAngleX"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>FOV y</Label>
+                <Slider fx:id="sFOVY" min="1" max="89"></Slider>
+                <Label fx:id="labelAngleY"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer x</Label>
+                <TextField fx:id="tFObserverX"></TextField>
+                <Label fx:id="labelObserverX"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer y</Label>
+                <TextField fx:id="tFObserverY"></TextField>
+                <Label fx:id="labelObserverY"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer z</Label>
+                <TextField fx:id="tFObserverZ"></TextField>
+                <Label fx:id="labelObserverZ"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Light x</Label>
+                <TextField fx:id="tFLightX"></TextField>
+                <Label fx:id="labelLightX"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Light y</Label>
+                <TextField fx:id="tFLightY"></TextField>
+                <Label fx:id="labelLightY"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Light z</Label>
+                <TextField fx:id="tFLightZ"></TextField>
+                <Label fx:id="labelLightZ"> </Label>
+            </HBox>
+        </VBox>
+    </HBox>
 </StackPane>

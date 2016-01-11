@@ -18,7 +18,15 @@ import java.util.Scanner;
  */
 public class OBJReader implements IOBJReader {
 
-    private double scale = 1.0;
+    private double scale;
+
+    public double getScale() {
+        return scale;
+    }
+
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
 
     public OBJResponse readFile(String fileName) {
         OBJResponse response = new OBJResponse();
@@ -65,12 +73,34 @@ public class OBJReader implements IOBJReader {
                             normalVectors.get(normalVectorIndex2),
                             normalVectors.get(normalVectorIndex3)
                     ));
+
                 } else {
-                    throw new Exception("Not supported line" + sc.next());
+//                    throw new Exception("Not supported line" + sc.next());
                 }
             }
 
             sc.close();
+
+            //compute normal averages
+            ArrayList<Vector3DModel> normals = new ArrayList<>(100);
+            for (Vertex3DModel vertex : vertices) {
+                for (TriangleModel triangle : triangles) {
+                    if (triangle.a == vertex) {
+                        normals.add(triangle.aNorm);
+                    } else if (triangle.b == vertex) {
+                        normals.add(triangle.bNorm);
+                    } else if (triangle.c == vertex) {
+                        normals.add(triangle.cNorm);
+                    }
+                }
+                vertex.normX = normals.stream().mapToDouble(value -> value.x).average().getAsDouble();
+                vertex.normY = normals.stream().mapToDouble(value -> value.y).average().getAsDouble();
+                vertex.normZ = normals.stream().mapToDouble(value -> value.z).average().getAsDouble();
+
+                vertex.normalize();
+                normals.clear();
+            }
+
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(null, e.getMessage());
         } catch (Exception e) {

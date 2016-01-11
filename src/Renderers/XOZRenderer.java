@@ -13,7 +13,7 @@ import java.util.ArrayList;
 /**
  * Created by bider_000 on 08.01.2016.
  */
-public class XOYRenderer implements IRenderer {
+public class XOZRenderer implements IRenderer {
 
     ArrayList<Vertex3DModel> vertices;
 
@@ -26,20 +26,20 @@ public class XOYRenderer implements IRenderer {
 
     double[][] zBuffer = new double[Configuration.IMAGE_WIDTH][Configuration.IMAGE_HEIGHT];
 
-    public XOYRenderer(ArrayList<Vertex3DModel> vertices, ArrayList<TriangleModel> triangles, PixelWriter pixelWriter) {
+    public XOZRenderer(ArrayList<Vertex3DModel> vertices, ArrayList<TriangleModel> triangles, PixelWriter pixelWriter) {
         this.vertices = vertices;
         this.triangles = triangles;
         this.pixelWriter = pixelWriter;
     }
 
+
     public void render() {
-        //todo for, not clone
         for (int i = 0; i < Helpers.zBufferInitial.length; i++)
             zBuffer[i] = Helpers.zBufferInitial[i].clone();
 
         System.arraycopy(Helpers.whitePixelsData, 0, pixelData, 0, Helpers.whitePixelsData.length);
 
-        double x, x0, x1, y, y0, y1, t0, t1, dist;
+        double x, x0, x1, z, z0, z1, t0, t1, dist;
         double dot00, dot01, dot02, dot11, dot12, invDenom;
         int tempI, tempJ;
 
@@ -49,19 +49,19 @@ public class XOYRenderer implements IRenderer {
 
 
         for (TriangleModel model : triangles) {
-            tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.y, model.b.y, model.c.y));
-            br = new Point2D(Helpers.max(model.a.x, model.b.x, model.c.x), Helpers.max(model.a.y, model.b.y, model.c.y));
+            tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.z, model.b.z, model.c.z));
+            br = new Point2D(Helpers.max(model.a.x, model.b.x, model.c.x), Helpers.max(model.a.z, model.b.z, model.c.z));
 
             x0 = model.a.x - model.c.x;
             x1 = model.b.x - model.c.x;
 
-            y0 = model.a.y - model.c.y;
-            y1 = model.b.y - model.c.y;
+            z0 = model.a.z - model.c.z;
+            z1 = model.b.z - model.c.z;
 
             // Compute dot products
-            dot00 = x0 * x0 + y0 * y0;
-            dot01 = x0 * x1 + y0 * y1;
-            dot11 = x1 * x1 + y1 * y1;
+            dot00 = x0 * x0 + z0 * z0;
+            dot01 = x0 * x1 + z0 * z1;
+            dot11 = x1 * x1 + z1 * z1;
 
             // Compute barycentric coordinates
             invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
@@ -71,10 +71,10 @@ public class XOYRenderer implements IRenderer {
                     for (int j = (int) tl.getY(); j < (int) br.getY() + 1; j++) {
                         x = i - model.c.x;
 
-                        y = j - model.c.y;
+                        z = j - model.c.z;
 
-                        dot02 = x0 * x + y0 * y;
-                        dot12 = x1 * x + y1 * y;
+                        dot02 = x0 * x + z0 * z;
+                        dot12 = x1 * x + z1 * z;
 
                         t0 = (dot11 * dot02 - dot01 * dot12) * invDenom;
                         t1 = (dot00 * dot12 - dot01 * dot02) * invDenom;
@@ -83,7 +83,7 @@ public class XOYRenderer implements IRenderer {
                         if (t0 <= 0 || t1 <= 0 || t0 + t1 > 1) {
                             continue;
                         } else {
-                            dist = Math.abs(Configuration.observer.z - (model.a.z * t0 + model.b.z * t1 + model.c.z * (1 - t0 -
+                            dist = Math.abs(Configuration.observer.y - (model.a.y * t0 + model.b.y * t1 + model.c.y * (1 - t0 -
                                     t1)));
                             tempI = i + Configuration.IMAGE_WIDTH_HALF;
                             tempJ = j + Configuration.IMAGE_HEIGHT_HALF;
@@ -99,8 +99,8 @@ public class XOYRenderer implements IRenderer {
             }
         }
 
-        pixelWriter.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, Configuration.pixelRGBFormat, pixelData, 0,
-                Configuration.IMAGE_WIDTH * 3);
+        pixelWriter.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, Configuration.pixelRGBFormat,
+                pixelData, 0, Configuration.IMAGE_WIDTH * 3);
     }
 
 }

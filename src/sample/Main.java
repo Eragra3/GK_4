@@ -6,13 +6,17 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Locale;
+
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+        Locale.setDefault(Locale.ENGLISH);
+
         Parent root = FXMLLoader.load(getClass().getResource("main_window.fxml"));
         primaryStage.setTitle("Dr Martin to najlepszy prowadzący");
-        primaryStage.setScene(new Scene(root, 1000, 900));
+        primaryStage.setScene(new Scene(root, 1200, 900));
         primaryStage.show();
         primaryStage.setResizable(false);
     }

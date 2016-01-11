@@ -13,4 +13,18 @@ public class Vector3DModel {
         this.y = y;
         this.z = z;
     }
+
+    public Vector3DModel() {
+
+    }
+
+    public final void normalize() {
+        double length = Math.sqrt((x * x) + (y * y) + (z * z));
+        x /= length;
+        y /= length;
+        z /= length;
+    }
+    public final double length() {
+        return Math.sqrt((x * x) + (y * y) + (z * z));
+    }
 }
