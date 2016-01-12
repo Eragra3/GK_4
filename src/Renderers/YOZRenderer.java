@@ -5,7 +5,6 @@ import Common.Helpers;
 import Common.Models.TriangleModel;
 import Common.Models.Vertex3DModel;
 import javafx.geometry.Point2D;
-import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 
 import java.util.ArrayList;
@@ -32,11 +31,15 @@ public class YOZRenderer implements IRenderer {
         this.pixelWriter = pixelWriter;
     }
 
+    @Override
+    public void setPixelWriter(PixelWriter pixelWriter) {
+        this.pixelWriter = pixelWriter;
+    }
 
     public void render() {
         Helpers.resetZBuffer(zBuffer);
 
-        Helpers.resetPixelDataToWhite(pixelData);
+        Helpers.resetPixelData(pixelData);
 
         double y, y0, y1, z, z0, z1, t0, t1, dist;
         double dot00, dot01, dot02, dot11, dot12, invDenom;

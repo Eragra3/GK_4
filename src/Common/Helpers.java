@@ -29,6 +29,8 @@ public class Helpers {
         }
     }
 
+    private static RealMatrix vector = new Array2DRowRealMatrix(4, 1);
+
     public static double max(double... n) {
         int i = 0;
         double max = n[i];
@@ -69,13 +71,27 @@ public class Helpers {
         }
     }
 
-    public final static void resetPixelDataToWhite(byte[] pixelData) {
+    public final static void resetPixelData(byte[] pixelData) {
         for (int i = 0; i < pixelData.length; i++)
             pixelData[i] = -1;
     }
 
-    public final static void resetPixelDataToWhite(int[] pixelData) {
+    public final static void resetPixelData(int[] pixelData) {
         for (int i = 0; i < pixelData.length; i++)
-            pixelData[i] = 0xffffffff;
+            pixelData[i] = 0xff000000;
     }
+
+    public final static double clamp(double val, double min, double max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
+    public final static RealMatrix getColumnVector(double x, double y, double z) {
+        vector.setEntry(0, 0, x);
+        vector.setEntry(1, 0, y);
+        vector.setEntry(2, 0, z);
+        vector.setEntry(3, 0, 1);
+        return vector;
+    }
+
+
 }

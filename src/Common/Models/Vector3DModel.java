@@ -3,10 +3,7 @@ package Common.Models;
 /**
  * Created by bider_000 on 08.01.2016.
  */
-public class Vector3DModel {
-    public double x;
-    public double y;
-    public double z;
+public class Vector3DModel extends Basic3DPoint{
 
     public Vector3DModel(double x, double y, double z) {
         this.x = x;

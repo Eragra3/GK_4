@@ -1,8 +1,8 @@
 package Common;
 
+import Common.Models.LookAtModel;
 import Common.Models.LightSourceModel;
 import Common.Models.ObserverModel;
-import Common.Models.Vertex3DModel;
 import javafx.scene.image.PixelFormat;
 
 /**
@@ -12,22 +12,30 @@ public class Configuration {
     public static final int IMAGE_WIDTH = 400;
     public static final int IMAGE_HEIGHT = 400;
 
+    public static final double NEAR_Z = 1;
+    public static final double FAR_Z = 500;
+
     public static final int IMAGE_WIDTH_HALF = IMAGE_WIDTH / 2;
     public static final int IMAGE_HEIGHT_HALF = IMAGE_HEIGHT / 2;
 
     public final static PixelFormat pixelARGBFormat = PixelFormat.getIntArgbInstance();
 
-    private static int OBSERVER_X = 0;
-    private static int OBSERVER_Y = 0;
-    private static int OBSERVER_Z = -200;
-    private static double OBSERVER_ANGLE_X = 60.0;
-    private static double OBSERVER_ANGLE_Y = 60.0;
-    public static ObserverModel observer = new ObserverModel(OBSERVER_X, OBSERVER_Y, OBSERVER_Z, OBSERVER_ANGLE_X, OBSERVER_ANGLE_Y);
+    private final static int OBSERVER_X = 0;
+    private final static int OBSERVER_Y = 0;
+    private final static int OBSERVER_Z = -100;
+    private final static double OBSERVER_FOV_X = 60.0;
+    private final static double OBSERVER_FOV_Y = 60.0;
+    private final static double OBSERVER_X_ANGLE = 0.0;
+    private final static double OBSERVER_Y_ANGLE = 0.0;
+    private final static double OBSERVER_Z_ANGLE = 0.0;
+    public static ObserverModel observer = new ObserverModel(OBSERVER_X, OBSERVER_Y, OBSERVER_Z, OBSERVER_FOV_X, OBSERVER_FOV_Y,
+            OBSERVER_Y_ANGLE, OBSERVER_X_ANGLE, OBSERVER_Z_ANGLE);
+    public static LookAtModel lookAtPoint = new LookAtModel(0, 0, -40, 0, 0, 0);
 
-    public static int ambientLightR = 0;
-    public static int ambientLightG = 0;
-    public static int ambientLightB = 0;
-    public static LightSourceModel lightSource = new LightSourceModel(0, 0, -100, 200, 200, 200);
+    public static int ambientLightR = 20;
+    public static int ambientLightG = 20;
+    public static int ambientLightB = 20;
+    public static LightSourceModel lightSource = new LightSourceModel(0, 0, 200, 200, 200, 200);
 
     public static final int SYSTEM_X = 0;
     public static final int SYSTEM_Y = 0;

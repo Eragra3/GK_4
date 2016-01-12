@@ -1,10 +1,7 @@
 package Controllers;
 
 import Common.Configuration;
-import Common.Models.LightSourceModel;
-import Common.Models.ObserverModel;
-import Common.Models.TriangleModel;
-import Common.Models.Vertex3DModel;
+import Common.Models.*;
 import OBJReader.OBJReader;
 import OBJReader.OBJResponse;
 import Renderers.PerspectiveRenderer;
@@ -29,6 +26,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MainController implements Initializable {
+
+    final private String MODEL_NAME = "house.obj";
 
     @FXML
     Canvas cXOY;
@@ -78,6 +77,18 @@ public class MainController implements Initializable {
     TextField tFLightY;
     @FXML
     TextField tFLightZ;
+    @FXML
+    Slider sObserverYAngle;
+    @FXML
+    Slider sObserverXAngle;
+    @FXML
+    Slider sObserverZAngle;
+    @FXML
+    TextField tFLookAtX;
+    @FXML
+    TextField tFLookAtY;
+    @FXML
+    TextField tFLookAtZ;
     //
     //PREVIEW VALUES
     @FXML
@@ -96,6 +107,18 @@ public class MainController implements Initializable {
     Label labelLightY;
     @FXML
     Label labelLightZ;
+    @FXML
+    Label labelObserverXAngle;
+    @FXML
+    Label labelObserverYAngle;
+    @FXML
+    Label labelObserverZAngle;
+    @FXML
+    Label labelLookAtX;
+    @FXML
+    Label labelLookAtY;
+    @FXML
+    Label labelLookAtZ;
     //
 
     ArrayList<Vertex3DModel> vertices;
@@ -118,10 +141,10 @@ public class MainController implements Initializable {
         Locale.setDefault(Locale.ENGLISH);
 
         //bindings
-        labelAngleX.setText(String.valueOf(Configuration.observer.angleX));
-        labelAngleY.setText(String.valueOf(Configuration.observer.angleY));
-        sFOVX.setValue(Configuration.observer.angleX);
-        sFOVY.setValue(Configuration.observer.angleY);
+        labelAngleX.setText(String.valueOf(Configuration.observer.fovX));
+        labelAngleY.setText(String.valueOf(Configuration.observer.fovY));
+        sFOVX.setValue(Configuration.observer.fovX);
+        sFOVY.setValue(Configuration.observer.fovY);
         labelObserverX.setText(String.valueOf(Configuration.observer.x));
         labelObserverY.setText(String.valueOf(Configuration.observer.y));
         labelObserverZ.setText(String.valueOf(Configuration.observer.z));
@@ -134,6 +157,18 @@ public class MainController implements Initializable {
         tFLightX.setText(String.valueOf(Configuration.lightSource.x));
         tFLightY.setText(String.valueOf(Configuration.lightSource.y));
         tFLightZ.setText(String.valueOf(Configuration.lightSource.z));
+        labelObserverXAngle.setText(String.valueOf(Configuration.observer.xAngle));
+        labelObserverYAngle.setText(String.valueOf(Configuration.observer.yAngle));
+        labelObserverZAngle.setText(String.valueOf(Configuration.observer.zAngle));
+        sObserverXAngle.setValue(Configuration.observer.xAngle);
+        sObserverYAngle.setValue(Configuration.observer.yAngle);
+        sObserverZAngle.setValue(Configuration.observer.zAngle);
+        labelLookAtX.setText(String.valueOf(Configuration.lookAtPoint.x));
+        labelLookAtY.setText(String.valueOf(Configuration.lookAtPoint.y));
+        labelLookAtZ.setText(String.valueOf(Configuration.lookAtPoint.z));
+        tFLookAtX.setText(String.valueOf(Configuration.lookAtPoint.x));
+        tFLookAtY.setText(String.valueOf(Configuration.lookAtPoint.y));
+        tFLookAtZ.setText(String.valueOf(Configuration.lookAtPoint.z));
         bindListeners();
         //
 
@@ -175,14 +210,14 @@ public class MainController implements Initializable {
 //        perspectiveTask.start();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(() -> {
-//            try {
-                xoyRenderer.render();
-                xozRenderer.render();
-                yozRenderer.render();
-                perspectiveRenderer.render();
-//            } catch (Exception e){
-//                e.printStackTrace();
-//            }
+            try {
+            xoyRenderer.render();
+            xozRenderer.render();
+            yozRenderer.render();
+            perspectiveRenderer.render();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }, 1000, 100, TimeUnit.MILLISECONDS);
 //        Timer timer = new Timer("Main Timer", true);
 //        TimerTask renderersTask = new TimerTask() {
@@ -199,12 +234,12 @@ public class MainController implements Initializable {
 //        timer.scheduleAtFixedRate(renderersTask, 0L, 100L);
 
         for (int i = 0; i < Configuration.IMAGE_WIDTH; i += 2) {
-            axisPixelData[i + 200 * Configuration.IMAGE_WIDTH] = 0xff0000ff;
-            axisPixelData[200 + i * Configuration.IMAGE_WIDTH] = 0xff0000ff;
-            axisPixelData[190 + i * Configuration.IMAGE_WIDTH] = 0xff00ff00;
-            axisPixelData[210 + i * Configuration.IMAGE_WIDTH] = 0xff00ff00;
-            axisPixelData[i + 190 * Configuration.IMAGE_WIDTH] = 0xff00ff00;
-            axisPixelData[i + 210 * Configuration.IMAGE_WIDTH] = 0xff00ff00;
+            axisPixelData[i + 200 * Configuration.IMAGE_WIDTH] = 0xffffffff;
+            axisPixelData[200 + i * Configuration.IMAGE_WIDTH] = 0xffffffff;
+//            axisPixelData[190 + i * Configuration.IMAGE_WIDTH] = 0xff00ff00;
+//            axisPixelData[210 + i * Configuration.IMAGE_WIDTH] = 0xff00ff00;
+//            axisPixelData[i + 190 * Configuration.IMAGE_WIDTH] = 0xff00ff00;
+//            axisPixelData[i + 210 * Configuration.IMAGE_WIDTH] = 0xff00ff00;
         }
 
 //        AXISES
@@ -237,7 +272,7 @@ public class MainController implements Initializable {
     public void readFile() {
         OBJReader reader = new OBJReader();
         reader.setScale(Configuration.objectScale);
-        OBJResponse response = reader.readFile("sphere.obj");
+        OBJResponse response = reader.readFile(MODEL_NAME);
         vertices = response.vertices;
         triangles = response.triangles;
     }
@@ -250,7 +285,7 @@ public class MainController implements Initializable {
             cCameraAxis.setVisible(newValue);
         });
         sFOVX.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Configuration.observer.angleX = newValue.doubleValue();
+            Configuration.observer.fovX = newValue.doubleValue();
             perspectiveRenderer.reloadData();
             if (newValue.toString().length() < 4)
                 labelAngleX.setText(newValue.toString());
@@ -258,7 +293,7 @@ public class MainController implements Initializable {
                 labelAngleX.setText(newValue.toString().substring(0, 4));
         });
         sFOVY.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Configuration.observer.angleY = newValue.doubleValue();
+            Configuration.observer.fovY = newValue.doubleValue();
             perspectiveRenderer.reloadData();
             if (newValue.toString().length() < 4)
                 labelAngleY.setText(newValue.toString());
@@ -322,6 +357,13 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        tFLightX.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLightX.setText(String.valueOf(Double.parseDouble(tFLightX.getText()) + 1));
+                    else
+                        tFLightX.setText(String.valueOf(Double.parseDouble(tFLightX.getText()) - 1));
+                }
+        );
         tFLightX.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -334,6 +376,13 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        tFLightY.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLightY.setText(String.valueOf(Double.parseDouble(tFLightY.getText()) + 1));
+                    else
+                        tFLightY.setText(String.valueOf(Double.parseDouble(tFLightY.getText()) - 1));
+                }
+        );
         tFLightY.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -346,6 +395,13 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        tFLightZ.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLightZ.setText(String.valueOf(Double.parseDouble(tFLightZ.getText()) + 1));
+                    else
+                        tFLightZ.setText(String.valueOf(Double.parseDouble(tFLightZ.getText()) - 1));
+                }
+        );
         tFLightZ.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
                 try {
@@ -358,11 +414,95 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
+        sObserverXAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Configuration.observer.xAngle = Math.toRadians(newValue.doubleValue());
+            perspectiveRenderer.reloadData();
+            if (newValue.toString().length() < 4)
+                labelObserverXAngle.setText(newValue.toString());
+            else
+                labelObserverXAngle.setText(newValue.toString().substring(0, 4));
+        });
+        sObserverYAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Configuration.observer.yAngle = Math.toRadians(newValue.doubleValue());
+            perspectiveRenderer.reloadData();
+            if (newValue.toString().length() < 4)
+                labelObserverYAngle.setText(newValue.toString());
+            else
+                labelObserverYAngle.setText(newValue.toString().substring(0, 4));
+        });
+        sObserverZAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Configuration.observer.zAngle = Math.toRadians(newValue.doubleValue());
+            perspectiveRenderer.reloadData();
+            if (newValue.toString().length() < 4)
+                labelObserverZAngle.setText(newValue.toString());
+            else
+                labelObserverZAngle.setText(newValue.toString().substring(0, 4));
+        });
+
+
+        tFLookAtX.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLookAtX.setText(String.valueOf(Double.parseDouble(tFLookAtX.getText()) + 1));
+                    else
+                        tFLookAtX.setText(String.valueOf(Double.parseDouble(tFLookAtX.getText()) - 1));
+                }
+        );
+        tFLookAtX.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
+                try {
+                    double value = Double.parseDouble(newValue.replace(",", "."));
+                    Configuration.lookAtPoint.x = value;
+                    labelLookAtX.setText(String.valueOf(value));
+                    perspectiveRenderer.reloadData();
+                    renderOverlays();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Input is incorrect");
+                }
+        });
+        tFLookAtY.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLookAtY.setText(String.valueOf(Double.parseDouble(tFLookAtY.getText()) + 1));
+                    else
+                        tFLookAtY.setText(String.valueOf(Double.parseDouble(tFLookAtY.getText()) - 1));
+                }
+        );
+        tFLookAtY.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
+                try {
+                    double value = Double.parseDouble(newValue.replace(",", "."));
+                    Configuration.lookAtPoint.y = value;
+                    labelLookAtY.setText(String.valueOf(value));
+                    perspectiveRenderer.reloadData();
+                    renderOverlays();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Input is incorrect");
+                }
+        });
+        tFLookAtZ.setOnScroll(event -> {
+                    if (event.getDeltaY() > 0)
+                        tFLookAtZ.setText(String.valueOf(Double.parseDouble(tFLookAtZ.getText()) + 1));
+                    else
+                        tFLookAtZ.setText(String.valueOf(Double.parseDouble(tFLookAtZ.getText()) - 1));
+                }
+        );
+        tFLookAtZ.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > 0 && !newValue.equalsIgnoreCase("-"))
+                try {
+                    double value = Double.parseDouble(newValue.replace(",", "."));
+                    Configuration.lookAtPoint.z = value;
+                    labelLookAtZ.setText(String.valueOf(value));
+                    perspectiveRenderer.reloadData();
+                    renderOverlays();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Input is incorrect");
+                }
+        });
     }
 
     private final void renderOverlays() {
         ObserverModel o = Configuration.observer;
         LightSourceModel l = Configuration.lightSource;
+        LookAtModel lA = Configuration.lookAtPoint;
 
 
         pwAxisXOY.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, PixelFormat.getIntArgbInstance(), axisPixelData, 0,
@@ -372,6 +512,9 @@ public class MainController implements Initializable {
         gcXOY.fillRect(o.x + Configuration.IMAGE_WIDTH_HALF - 4, -o.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcXOY.setFill(Color.VIOLET);
         gcXOY.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.setFill(Color.GREEN);
+        gcXOY.fillOval(lA.x + Configuration.IMAGE_WIDTH_HALF - 4, -lA.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.setFill(Color.WHITE);
         gcXOY.strokeText("XOY", 10, 10);
         gcXOY.strokeText("X", 390, 215);
         gcXOY.strokeText("Y", 205, 15);
@@ -384,6 +527,9 @@ public class MainController implements Initializable {
         gcXOZ.fillRect(o.x + Configuration.IMAGE_WIDTH_HALF - 4, -o.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcXOZ.setFill(Color.VIOLET);
         gcXOZ.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOZ.setFill(Color.GREEN);
+        gcXOZ.fillOval(lA.x + Configuration.IMAGE_WIDTH_HALF - 4, -lA.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.setFill(Color.WHITE);
         gcXOZ.strokeText("XOZ", 10, 10);
         gcXOZ.strokeText("Z", 205, 15);
         gcXOZ.strokeText("X", 390, 215);
@@ -396,6 +542,9 @@ public class MainController implements Initializable {
         gcYOZ.fillRect(o.y + Configuration.IMAGE_WIDTH_HALF - 4, -o.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcYOZ.setFill(Color.VIOLET);
         gcYOZ.fillRect(l.y + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcYOZ.setFill(Color.GREEN);
+        gcYOZ.fillOval(lA.y + Configuration.IMAGE_WIDTH_HALF - 4, -lA.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
+        gcXOY.setFill(Color.WHITE);
         gcYOZ.strokeText("YOZ", 10, 10);
         gcYOZ.strokeText("Z", 205, 15);
         gcYOZ.strokeText("Y", 390, 215);

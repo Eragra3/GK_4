@@ -63,6 +63,36 @@
                 <Label fx:id="labelObserverZ"> </Label>
             </HBox>
             <HBox spacing="5">
+                <Label>Look at x</Label>
+                <TextField fx:id="tFLookAtX"></TextField>
+                <Label fx:id="labelLookAtX"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Look at y</Label>
+                <TextField fx:id="tFLookAtY"></TextField>
+                <Label fx:id="labelLookAtY"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Look at z</Label>
+                <TextField fx:id="tFLookAtZ"></TextField>
+                <Label fx:id="labelLookAtZ"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer x rotation</Label>
+                <Slider fx:id="sObserverXAngle" min="0" max="360"></Slider>
+                <Label fx:id="labelObserverXAngle"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer y rotation</Label>
+                <Slider fx:id="sObserverYAngle" min="0" max="360"></Slider>
+                <Label fx:id="labelObserverYAngle"> </Label>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Observer z rotation</Label>
+                <Slider fx:id="sObserverZAngle" min="0" max="360"></Slider>
+                <Label fx:id="labelObserverZAngle"> </Label>
+            </HBox>
+            <HBox spacing="5">
                 <Label>Light x</Label>
                 <TextField fx:id="tFLightX"></TextField>
                 <Label fx:id="labelLightX"> </Label>

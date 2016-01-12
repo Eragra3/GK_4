@@ -6,11 +6,7 @@ import java.util.List;
 /**
  * Created by bider_000 on 08.01.2016.
  */
-public class Vertex3DModel {
-    public double x;
-    public double y;
-    public double z;
-
+public class Vertex3DModel extends Basic3DPoint {
     public int a = 255;
     public int r = 255;
     public int g = 0;
