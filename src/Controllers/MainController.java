@@ -514,7 +514,7 @@ public class MainController implements Initializable {
         gcXOY.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcXOY.setFill(Color.GREEN);
         gcXOY.fillOval(lA.x + Configuration.IMAGE_WIDTH_HALF - 4, -lA.y + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
-        gcXOY.setFill(Color.WHITE);
+        gcXOY.setStroke(Color.WHITE);
         gcXOY.strokeText("XOY", 10, 10);
         gcXOY.strokeText("X", 390, 215);
         gcXOY.strokeText("Y", 205, 15);
@@ -529,7 +529,7 @@ public class MainController implements Initializable {
         gcXOZ.fillRect(l.x + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcXOZ.setFill(Color.GREEN);
         gcXOZ.fillOval(lA.x + Configuration.IMAGE_WIDTH_HALF - 4, -lA.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
-        gcXOY.setFill(Color.WHITE);
+        gcXOZ.setStroke(Color.WHITE);
         gcXOZ.strokeText("XOZ", 10, 10);
         gcXOZ.strokeText("Z", 205, 15);
         gcXOZ.strokeText("X", 390, 215);
@@ -544,7 +544,7 @@ public class MainController implements Initializable {
         gcYOZ.fillRect(l.y + Configuration.IMAGE_WIDTH_HALF - 4, -l.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
         gcYOZ.setFill(Color.GREEN);
         gcYOZ.fillOval(lA.y + Configuration.IMAGE_WIDTH_HALF - 4, -lA.z + Configuration.IMAGE_HEIGHT_HALF - 5, 9, 9);
-        gcXOY.setFill(Color.WHITE);
+        gcYOZ.setStroke(Color.WHITE);
         gcYOZ.strokeText("YOZ", 10, 10);
         gcYOZ.strokeText("Z", 205, 15);
         gcYOZ.strokeText("Y", 390, 215);

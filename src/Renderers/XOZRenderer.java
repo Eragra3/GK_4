@@ -66,9 +66,12 @@ public class XOZRenderer implements IRenderer {
         //
 
         for (TriangleModel model : triangles) {
-            calculateLighting(projectVertex(model.a), normal, lightVector, observerVector, reflectionVector, aColor);
-            calculateLighting(projectVertex(model.b), normal, lightVector, observerVector, reflectionVector, bColor);
-            calculateLighting(projectVertex(model.c), normal, lightVector, observerVector, reflectionVector, cColor);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
 
             tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.z, model.b.z, model.c.z));
             br = new Point2D(Helpers.max(model.a.x, model.b.x, model.c.x), Helpers.max(model.a.z, model.b.z, model.c.z));
@@ -106,7 +109,7 @@ public class XOZRenderer implements IRenderer {
                         } else {
                             dist = Math.abs(Configuration.observer.y - (model.a.y * u + model.b.y * v + model.c.y * (1 - u -
                                     v)));
-                            tempI = i + Configuration.IMAGE_WIDTH_HALF;
+                            tempI = -i + Configuration.IMAGE_WIDTH_HALF;
                             //JAVAFX y coordinate grows downwards, hence minus sign
                             tempJ = -j + Configuration.IMAGE_HEIGHT_HALF;
                             if (dist < zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI]) {
@@ -130,113 +133,6 @@ public class XOZRenderer implements IRenderer {
 
         pixelWriter.setPixels(0, 0, Configuration.IMAGE_WIDTH, Configuration.IMAGE_HEIGHT, Configuration.pixelARGBFormat,
                 pixelData, 0, Configuration.IMAGE_WIDTH);
-    }
-
-    private final ColorModel calculateLighting(Vertex3DModel projectedVertex, Vector3DModel normal, LightSourceModel
-            lightVector, Vector3DModel observerVector, Vector3DModel reflectionVector, ColorModel resultColor) {
-        double red, green, blue;
-        final int n = 50;
-        normal.x = projectedVertex.normX;
-        normal.y = projectedVertex.normY;
-        normal.z = projectedVertex.normZ;
-
-        lightVector = projectLightSource(Configuration.lightSource);
-        lightVector.x = lightVector.x - projectedVertex.x;
-        lightVector.y = lightVector.y - projectedVertex.y;
-        lightVector.z = lightVector.z - projectedVertex.z;
-
-
-        //observer is hardcoded at 0 0 0
-        observerVector.x = projectedVertex.x - Configuration.observer.x;
-        observerVector.y = projectedVertex.y - Configuration.observer.y;
-        observerVector.z = projectedVertex.z - Configuration.observer.z;
-
-        //normalize
-        lightVector.normalize();
-        observerVector.normalize();
-        normal.normalize();
-        //
-
-        //reflection vector
-        reflectionVector.x = 2 * Helpers.dotProduct(normal, lightVector) * normal.x - lightVector.x;
-        reflectionVector.y = 2 * Helpers.dotProduct(normal, lightVector) * normal.y - lightVector.y;
-        reflectionVector.z = 2 * Helpers.dotProduct(normal, lightVector) * normal.z - lightVector.z;
-        reflectionVector.normalize();
-        //
-
-        double normalLightVectorDotProduct = Helpers.dotProduct(normal, lightVector);
-        if (normalLightVectorDotProduct < 0)
-            normalLightVectorDotProduct = 0;
-
-        double reflectionObserverVectorDotProduct = Helpers.dotProduct(reflectionVector, observerVector);
-        if (reflectionObserverVectorDotProduct < 0)
-            reflectionObserverVectorDotProduct = 0;
-        else
-            reflectionObserverVectorDotProduct = Math.pow(reflectionObserverVectorDotProduct, n);
-
-        red = projectedVertex.ka * Configuration.ambientLightR + Configuration.lightSource.r * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-        green = projectedVertex.ka * Configuration.ambientLightG + Configuration.lightSource.g * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-        blue = projectedVertex.ka * Configuration.ambientLightB + Configuration.lightSource.b * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-
-        resultColor.red = (int) Helpers.clamp(red, 0, 255);
-        resultColor.green = (int) Helpers.clamp(green, 0, 255);
-        resultColor.blue = (int) Helpers.clamp(blue, 0, 255);
-        resultColor.alpha = 255;
-
-        return resultColor;
-    }
-
-    final private LightSourceModel projectLightSource(LightSourceModel lightSourceModel) {
-        RealMatrix projectionResult;
-
-        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {lightSourceModel.x},
-                        {lightSourceModel.y},
-                        {lightSourceModel.z},
-                        {1}
-                }
-        ));
-
-        LightSourceModel resultLightSourceModel;
-
-        resultLightSourceModel = new LightSourceModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0),
-                lightSourceModel.r,
-                lightSourceModel.g,
-                lightSourceModel.b
-        );
-        return resultLightSourceModel;
-    }
-
-    final private Vertex3DModel projectVertex(Vertex3DModel vertex) {
-        RealMatrix projectionResult;
-
-        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {vertex.x},
-                        {vertex.y},
-                        {vertex.z},
-                        {1}
-                }
-        ));
-
-        Vertex3DModel resultVertex;
-
-        resultVertex = new Vertex3DModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0)
-        );
-        resultVertex.normX = vertex.normX;
-        resultVertex.normY = vertex.normY;
-        resultVertex.normZ = vertex.normZ;
-        return resultVertex;
     }
 
     final private void prepareProjectionMatrix() {

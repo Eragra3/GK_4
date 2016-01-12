@@ -78,11 +78,14 @@ public class PerspectiveRenderer implements IRenderer {
         RealMatrix invProjectionResult;
 
         for (TriangleModel model : triangles) {
-            projectedTriangle = projectTriangle(model);
+            projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix);
 
-            calculateLighting(projectVertex(model.a), normal, lightVector, observerVector, reflectionVector, aColor);
-            calculateLighting(projectVertex(model.b), normal, lightVector, observerVector, reflectionVector, bColor);
-            calculateLighting(projectVertex(model.c), normal, lightVector, observerVector, reflectionVector, cColor);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
+                    reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
 
             tlX = Helpers.min(projectedTriangle.a.x, projectedTriangle.b.x, projectedTriangle.c.x);
             tlY = Helpers.min(projectedTriangle.a.y, projectedTriangle.b.y, projectedTriangle.c.y);
@@ -127,8 +130,8 @@ public class PerspectiveRenderer implements IRenderer {
 //                            ));
 
 //                            dist = projectedTriangle.a.z * t0 + projectedTriangle.b.z * t1 + projectedTriangle.c.z * (1 - t0 - t1);
-                            workingPoint = getVertexFromBarycentric(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
-                            dist = projectVertex(workingPoint).z;
+                            workingPoint = CommonMethods.getVertexFromBarycentric(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
+                            dist = CommonMethods.projectVertex(workingPoint, projectionMatrix).z;
 //                            tempI = (int) (invProjectionResult.getEntry(0, 0) / invProjectionMatrix.getEntry(3, 0) +
 //                                    Configuration.IMAGE_WIDTH_HALF);
 //                            tempJ = -((int) (invProjectionResult.getEntry(1, 0) / invProjectionMatrix.getEntry(3, 0) +
@@ -161,206 +164,6 @@ public class PerspectiveRenderer implements IRenderer {
 
     public void reloadData() {
         prepareProjectionMatrix();
-    }
-
-    private final ColorModel calculateLighting(Vertex3DModel projectedVertex, Vector3DModel normal, LightSourceModel
-            lightVector, Vector3DModel observerVector, Vector3DModel reflectionVector, ColorModel resultColor) {
-        double red, green, blue;
-        final int n = 50;
-        normal.x = projectedVertex.normX;
-        normal.y = projectedVertex.normY;
-        normal.z = projectedVertex.normZ;
-        normal = projectNormal(normal);
-
-        lightVector = projectLightSource(Configuration.lightSource);
-        lightVector.x = lightVector.x - projectedVertex.x;
-        lightVector.y = lightVector.y - projectedVertex.y;
-        lightVector.z = lightVector.z - projectedVertex.z;
-
-
-        //observer is hardcoded at 0 0 0
-        observerVector.x = projectedVertex.x - Configuration.observer.x;
-        observerVector.y = projectedVertex.y - Configuration.observer.y;
-        observerVector.z = projectedVertex.z - Configuration.observer.z;
-
-        //normalize
-        lightVector.normalize();
-        observerVector.normalize();
-        normal.normalize();
-        //
-
-        //reflection vector
-        reflectionVector.x = 2 * Helpers.dotProduct(normal, lightVector) * normal.x - lightVector.x;
-        reflectionVector.y = 2 * Helpers.dotProduct(normal, lightVector) * normal.y - lightVector.y;
-        reflectionVector.z = 2 * Helpers.dotProduct(normal, lightVector) * normal.z - lightVector.z;
-        reflectionVector.normalize();
-        //
-
-        double normalLightVectorDotProduct = Helpers.dotProduct(normal, lightVector);
-        if (normalLightVectorDotProduct < 0)
-            normalLightVectorDotProduct = 0;
-
-        double reflectionObserverVectorDotProduct = Helpers.dotProduct(reflectionVector, observerVector);
-        if (reflectionObserverVectorDotProduct < 0)
-            reflectionObserverVectorDotProduct = 0;
-        else
-            reflectionObserverVectorDotProduct = Math.pow(reflectionObserverVectorDotProduct, n);
-
-        red = projectedVertex.ka * Configuration.ambientLightR + Configuration.lightSource.r * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-        green = projectedVertex.ka * Configuration.ambientLightG + Configuration.lightSource.g * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-        blue = projectedVertex.ka * Configuration.ambientLightB + Configuration.lightSource.b * (projectedVertex.kd * normalLightVectorDotProduct +
-                projectedVertex.ks * reflectionObserverVectorDotProduct);
-
-        resultColor.red = (int) Helpers.clamp(red, 0, 255);
-        resultColor.green = (int) Helpers.clamp(green, 0, 255);
-        resultColor.blue = (int) Helpers.clamp(blue, 0, 255);
-        resultColor.alpha = 255;
-
-        return resultColor;
-    }
-
-    final private Vertex3DModel getVertexFromBarycentric(double u, double v, Vertex3DModel a, Vertex3DModel b, Vertex3DModel c) {
-        Vertex3DModel workingPoint = new Vertex3DModel(
-                a.x * u + b.x * v + c.x * (1 - u - v),
-                a.y * u + b.y * v + c.y * (1 - u - v),
-                a.z * u + b.z * v + c.z * (1 - u - v)
-        );
-        return workingPoint;
-    }
-
-    final private TriangleModel projectTriangle(TriangleModel triangle) {
-        TriangleModel projectedTriangle;
-
-        projectedTriangle = new TriangleModel(
-                projectVertex(triangle.a),
-                projectVertex(triangle.b),
-                projectVertex(triangle.c),
-                triangle.aNorm,
-                triangle.bNorm,
-                triangle.cNorm
-        );
-
-        return projectedTriangle;
-    }
-
-    final private Vertex3DModel projectVertex(Vertex3DModel vertex) {
-        RealMatrix projectionResult;
-
-        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {vertex.x},
-                        {vertex.y},
-                        {vertex.z},
-                        {1}
-                }
-        ));
-
-        Vertex3DModel resultVertex;
-
-        resultVertex = new Vertex3DModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0)
-        );
-        resultVertex.normX = vertex.normX;
-        resultVertex.normY = vertex.normY;
-        resultVertex.normZ = vertex.normZ;
-        return resultVertex;
-    }
-
-    final private Vector3DModel projectVector(Vector3DModel vector) {
-        RealMatrix projectionResult;
-
-        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {vector.x},
-                        {vector.y},
-                        {vector.z},
-                        {1}
-                }
-        ));
-
-        Vector3DModel resultVector;
-
-        resultVector = new Vector3DModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0)
-        );
-        return resultVector;
-    }
-
-    final private LightSourceModel projectLightSource(LightSourceModel lightSourceModel) {
-        RealMatrix projectionResult;
-
-        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {lightSourceModel.x},
-                        {lightSourceModel.y},
-                        {lightSourceModel.z},
-                        {1}
-                }
-        ));
-
-        LightSourceModel resultLightSourceModel;
-
-        resultLightSourceModel = new LightSourceModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0)
-        );
-        resultLightSourceModel.r = lightSourceModel.r;
-        resultLightSourceModel.g = lightSourceModel.g;
-        resultLightSourceModel.b = lightSourceModel.b;
-        return resultLightSourceModel;
-    }
-
-    final private Vector3DModel projectNormal(Vector3DModel vertex) {
-        RealMatrix projectionResult;
-
-        projectionResult = normalsProjectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {vertex.x},
-                        {vertex.y},
-                        {vertex.z},
-                        {1}
-                }
-        ));
-
-        Vector3DModel resultVector;
-
-        resultVector = new Vector3DModel(
-                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
-                projectionResult.getEntry(2, 0)
-        );
-
-        return resultVector;
-    }
-
-    final private Vertex3DModel unprojectVertex(Vertex3DModel vertex) {
-        RealMatrix multResult;
-
-        multResult = invProjectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
-                {
-                        {vertex.x},
-                        {vertex.y},
-                        {vertex.z},
-                        {1}
-                }
-        ));
-
-        Vertex3DModel resultVertex;
-
-        resultVertex = new Vertex3DModel(
-                multResult.getEntry(0, 0) / multResult.getEntry(3, 0),
-                multResult.getEntry(1, 0) / multResult.getEntry(3, 0),
-                multResult.getEntry(2, 0)
-        );
-
-        return resultVertex;
     }
 
     final private void prepareProjectionMatrix() {
@@ -401,9 +204,9 @@ public class PerspectiveRenderer implements IRenderer {
         //translation
         RealMatrix translationM = new Array2DRowRealMatrix(new double[][]
                 {
-                        {1, 0, 0, -lA.x},
-                        {0, 1, 0, -lA.y},
-                        {0, 0, 1, -lA.z},
+                        {1, 0, 0, lA.x},
+                        {0, 1, 0, lA.y},
+                        {0, 0, 1, lA.z},
                         {0, 0, 0, 1}
                 }
         );
