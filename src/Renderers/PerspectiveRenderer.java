@@ -186,9 +186,14 @@ public class PerspectiveRenderer implements IRenderer {
 
         projectionMatrix = new Array2DRowRealMatrix(new double[][]
                 {
-                        {Configuration.IMAGE_WIDTH_HALF * fovX, 0, 0, 0},
-                        {0, Configuration.IMAGE_HEIGHT_HALF * fovY, 0, 0},
-                        {0, 0, -((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)), -((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))},
+                        {Configuration.IMAGE_WIDTH * fovX, 0, 0, 0},
+                        {0, Configuration.IMAGE_HEIGHT * fovY, 0, 0},
+                        {
+                                0,
+                                0,
+                                -((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
+                                -((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))
+                        },
                         {0, 0, -1, 1}
                 }
         );
@@ -215,7 +220,8 @@ public class PerspectiveRenderer implements IRenderer {
         RealMatrix transformedObserverVector = Helpers.getColumnVector(
                 transformedObserverModel.x,
                 transformedObserverModel.y,
-                transformedObserverModel.z);
+                transformedObserverModel.z
+        );
 
         transformedObserverVector = translationM.multiply(transformedObserverVector);
         transformedObserverModel.x = transformedObserverVector.getEntry(0, 0) / transformedObserverVector.getEntry(3, 0);

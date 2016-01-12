@@ -8,6 +8,7 @@ import Renderers.PerspectiveRenderer;
 import Renderers.XOYRenderer;
 import Renderers.XOZRenderer;
 import Renderers.YOZRenderer;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -16,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
+import javafx.scene.input.MouseDragEvent;
 import javafx.scene.paint.Color;
 
 import javax.swing.*;
@@ -496,6 +498,17 @@ public class MainController implements Initializable {
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
+        });
+
+        //CAMERA CONTROLS
+        cXOYAxis.addEventFilter(MouseDragEvent.ANY, event -> {
+            double initialX;
+            if (event.getEventType() == MouseDragEvent.MOUSE_DRAG_ENTERED) {
+                initialX = event.getX();
+            } else if (event.getEventType() == MouseDragEvent.MOUSE_DRAG_EXITED) {
+                //todo
+                tFLookAtX.setText(String.valueOf(initialX - event.getX()));
+            }
         });
     }
 
