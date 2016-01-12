@@ -194,9 +194,12 @@ public class PerspectiveRenderer implements IRenderer {
                                 -((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
                                 -((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))
                         },
-                        {0, 0, -1, 1}
+                        {0, 0, 1, 1}
                 }
         );
+
+        RealMatrix dV = Helpers.getColumnVector(0, 0, 1);
+
 //        projectionMatrix = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
 //                {
 //                        {1, 0, 0, 0},
@@ -209,13 +212,12 @@ public class PerspectiveRenderer implements IRenderer {
         //translation
         RealMatrix translationM = new Array2DRowRealMatrix(new double[][]
                 {
-                        {1, 0, 0, lA.x},
-                        {0, 1, 0, lA.y},
-                        {0, 0, 1, lA.z},
+                        {1, 0, 0, -lA.x},
+                        {0, 1, 0, -lA.y},
+                        {0, 0, 1, -lA.z},
                         {0, 0, 0, 1}
                 }
         );
-        projectionMatrix = projectionMatrix.multiply(translationM);
 
         RealMatrix transformedObserverVector = Helpers.getColumnVector(
                 transformedObserverModel.x,
@@ -223,13 +225,14 @@ public class PerspectiveRenderer implements IRenderer {
                 transformedObserverModel.z
         );
 
-        transformedObserverVector = translationM.multiply(transformedObserverVector);
-        transformedObserverModel.x = transformedObserverVector.getEntry(0, 0) / transformedObserverVector.getEntry(3, 0);
-        transformedObserverModel.y = transformedObserverVector.getEntry(1, 0) / transformedObserverVector.getEntry(3, 0);
-        transformedObserverModel.z = transformedObserverVector.getEntry(2, 0) / transformedObserverVector.getEntry(3, 0);
+//        transformedObserverVector = translationM.multiply(transformedObserverVector);
+//        transformedObserverModel.x = transformedObserverVector.getEntry(0, 0) / transformedObserverVector.getEntry(3, 0);
+//        transformedObserverModel.y = transformedObserverVector.getEntry(1, 0) / transformedObserverVector.getEntry(3, 0);
+//        transformedObserverModel.z = transformedObserverVector.getEntry(2, 0) / transformedObserverVector.getEntry(3, 0);
+        dV = translationM.multiply(dV);
 
         //OY rotation
-        Configuration.lookAtPoint.yAngle = Math.PI - Math.atan2(transformedObserverModel.x, transformedObserverModel.z);
+        Configuration.lookAtPoint.yAngle = -Math.PI - Math.atan2(transformedObserverModel.x, transformedObserverModel.z);
 
         RealMatrix yRotationM = new Array2DRowRealMatrix(new double[][]
                 {
@@ -240,12 +243,12 @@ public class PerspectiveRenderer implements IRenderer {
                 }
         );
 
-        projectionMatrix = projectionMatrix.multiply(yRotationM);
         //OX rotation
         transformedObserverVector = yRotationM.multiply(transformedObserverVector);
         transformedObserverModel.x = transformedObserverVector.getEntry(0, 0) / transformedObserverVector.getEntry(3, 0);
         transformedObserverModel.y = transformedObserverVector.getEntry(1, 0) / transformedObserverVector.getEntry(3, 0);
         transformedObserverModel.z = transformedObserverVector.getEntry(2, 0) / transformedObserverVector.getEntry(3, 0);
+        dV = yRotationM.multiply(dV);
 
         Configuration.lookAtPoint.xAngle = -Math.PI / 2 - Math.atan2(transformedObserverModel.z, transformedObserverModel.y);
 
@@ -258,19 +261,20 @@ public class PerspectiveRenderer implements IRenderer {
                 }
         );
 
-        projectionMatrix = projectionMatrix.multiply(xRotationM);
+        dV = xRotationM.multiply(dV);
+        Configuration.lookAtPoint.zAngle = Math.PI / 2 - Math.atan2(
+                dV.getEntry(1, 0) / dV.getEntry(3, 0),
+                dV.getEntry(0, 0) / dV.getEntry(3, 0)
+        );
+        RealMatrix zRotationM = new Array2DRowRealMatrix(new double[][]
+                {
+                        {Math.cos(Configuration.lookAtPoint.zAngle), -Math.sin(Configuration.lookAtPoint.zAngle), 0, 0},
+                        {Math.sin(Configuration.lookAtPoint.zAngle), Math.cos(Configuration.lookAtPoint.zAngle), 0, 0},
+                        {0, 0, 1, 0},
+                        {0, 0, 0, 1}
+                }
+        );
 
-//        Configuration.lookAtPoint.xAngle = Math.PI / 2 - Math.atan2(transformedObserverModel.y, transformedObserverModel.x);
-//        RealMatrix zRotationM = new Array2DRowRealMatrix(new double[][]
-//                {
-//                        {Math.cos(Configuration.lookAtPoint.zAngle), -Math.sin(Configuration.lookAtPoint.zAngle), 0, 0},
-//                        {Math.sin(Configuration.lookAtPoint.zAngle), Math.cos(Configuration.lookAtPoint.zAngle), 0, 0},
-//                        {0, 0, 1, 0},
-//                        {0, 0, 0, 1}
-//                }
-//        );
-//
-//        projectionMatrix = projectionMatrix.multiply(zRotationM);
 
 //        projectionMatrix = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
 //                {
@@ -289,6 +293,19 @@ public class PerspectiveRenderer implements IRenderer {
 //                        {0, 0, 0, 1}
 //                }
 //        ));
+        projectionMatrix = projectionMatrix.multiply(translationM);
+        projectionMatrix = projectionMatrix.multiply(yRotationM);
+        projectionMatrix = projectionMatrix.multiply(xRotationM);
+        projectionMatrix = projectionMatrix.multiply(zRotationM);
+
+//        projectionMatrix = projectionMatrix.multiply(new Array2DRowRealMatrix (new double[][] {
+//                {1, 0, 0, 0},
+//                {0, -1, 0, 0},
+//                {0, 0, 1, 0},
+//                {0, 0, 0, 1}
+//        }));
+
+
         invProjectionMatrix = MatrixUtils.inverse(projectionMatrix);
         normalsProjectionMatrix = invProjectionMatrix.transpose();
     }

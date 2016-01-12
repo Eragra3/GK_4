@@ -507,7 +507,7 @@ public class MainController implements Initializable {
                 initialX = event.getX();
             } else if (event.getEventType() == MouseDragEvent.MOUSE_DRAG_EXITED) {
                 //todo
-                tFLookAtX.setText(String.valueOf(initialX - event.getX()));
+//                tFLookAtX.setText(String.valueOf(initialX - event.getX()));
             }
         });
     }
