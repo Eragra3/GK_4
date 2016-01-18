@@ -155,7 +155,7 @@ public class CommonMethods {
 
     public final static ColorModel calculateLighting(Vertex3DModel projectedVertex, Vector3DModel normal, LightSourceModel
             lightVector, Vector3DModel observerVector, Vector3DModel reflectionVector, ColorModel resultColor, RealMatrix
-            normalsProjectionMatrix, RealMatrix projectionMatrix) {
+                                                             normalsProjectionMatrix, RealMatrix projectionMatrix) {
         double red, green, blue;
         final int n = 100;
         normal.x = projectedVertex.normX;
@@ -210,5 +210,23 @@ public class CommonMethods {
         resultColor.alpha = 255;
 
         return resultColor;
+    }
+
+    public final static int GouradShading(ColorModel aColor, ColorModel bColor, ColorModel cColor, double u, double v) {
+        int alpha = 255;
+        int red = (int) (aColor.red * u + bColor.red * v + cColor.red * (1 - u - v));
+        int green = (int) (aColor.green * u + bColor.green * v + cColor.green * (1 - u - v));
+        int blue = (int) (aColor.blue * u + bColor.blue * v + cColor.blue * (1 - u - v));
+        return (alpha << 24) + (red << 16) + (green << 8) + blue;
+    }
+
+    public final static int PhongShading(ColorModel aColor, ColorModel bColor, ColorModel cColor, double u, double v) {
+
+
+        int alpha = 255;
+        int red = (int) (aColor.red * u + bColor.red * v + cColor.red * (1 - u - v));
+        int green = (int) (aColor.green * u + bColor.green * v + cColor.green * (1 - u - v));
+        int blue = (int) (aColor.blue * u + bColor.blue * v + cColor.blue * (1 - u - v));
+        return (alpha << 24) + (red << 16) + (green << 8) + blue;
     }
 }

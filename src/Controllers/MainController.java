@@ -8,7 +8,6 @@ import Renderers.PerspectiveRenderer;
 import Renderers.XOYRenderer;
 import Renderers.XOZRenderer;
 import Renderers.YOZRenderer;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -80,17 +79,19 @@ public class MainController implements Initializable {
     @FXML
     TextField tFLightZ;
     @FXML
-    Slider sObserverYAngle;
-    @FXML
-    Slider sObserverXAngle;
-    @FXML
-    Slider sObserverZAngle;
-    @FXML
     TextField tFLookAtX;
     @FXML
     TextField tFLookAtY;
     @FXML
     TextField tFLookAtZ;
+    @FXML
+    CheckBox chBPhong;
+    @FXML
+    Slider sKs;
+    @FXML
+    Slider sKd;
+    @FXML
+    Slider sKa;
     //
     //PREVIEW VALUES
     @FXML
@@ -109,12 +110,6 @@ public class MainController implements Initializable {
     Label labelLightY;
     @FXML
     Label labelLightZ;
-    @FXML
-    Label labelObserverXAngle;
-    @FXML
-    Label labelObserverYAngle;
-    @FXML
-    Label labelObserverZAngle;
     @FXML
     Label labelLookAtX;
     @FXML
@@ -159,12 +154,15 @@ public class MainController implements Initializable {
         tFLightX.setText(String.valueOf(Configuration.lightSource.x));
         tFLightY.setText(String.valueOf(Configuration.lightSource.y));
         tFLightZ.setText(String.valueOf(Configuration.lightSource.z));
-        labelObserverXAngle.setText(String.valueOf(Configuration.observer.xAngle));
-        labelObserverYAngle.setText(String.valueOf(Configuration.observer.yAngle));
-        labelObserverZAngle.setText(String.valueOf(Configuration.observer.zAngle));
-        sObserverXAngle.setValue(Configuration.observer.xAngle);
-        sObserverYAngle.setValue(Configuration.observer.yAngle);
-        sObserverZAngle.setValue(Configuration.observer.zAngle);
+//        labelObserverXAngle.setText(String.valueOf(Configuration.observer.xAngle));
+//        labelObserverYAngle.setText(String.valueOf(Configuration.observer.yAngle));
+//        labelObserverZAngle.setText(String.valueOf(Configuration.observer.zAngle));
+//        sObserverXAngle.setValue(Configuration.observer.xAngle);
+//        sObserverYAngle.setValue(Configuration.observer.yAngle);
+//        sObserverZAngle.setValue(Configuration.observer.zAngle);
+        sKa.setValue(Vertex3DModel.ka);
+        sKd.setValue(Vertex3DModel.kd);
+        sKs.setValue(Vertex3DModel.ks);
         labelLookAtX.setText(String.valueOf(Configuration.lookAtPoint.x));
         labelLookAtY.setText(String.valueOf(Configuration.lookAtPoint.y));
         labelLookAtZ.setText(String.valueOf(Configuration.lookAtPoint.z));
@@ -416,31 +414,33 @@ public class MainController implements Initializable {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
         });
-        sObserverXAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Configuration.observer.xAngle = Math.toRadians(newValue.doubleValue());
-            perspectiveRenderer.reloadData();
-            if (newValue.toString().length() < 4)
-                labelObserverXAngle.setText(newValue.toString());
-            else
-                labelObserverXAngle.setText(newValue.toString().substring(0, 4));
+//        sObserverXAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            Configuration.observer.xAngle = Math.toRadians(newValue.doubleValue());
+//            perspectiveRenderer.reloadData();
+//            if (newValue.toString().length() < 4)
+//                labelObserverXAngle.setText(newValue.toString());
+//            else
+//                labelObserverXAngle.setText(newValue.toString().substring(0, 4));
+//        });
+//        sObserverYAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            Configuration.observer.yAngle = Math.toRadians(newValue.doubleValue());
+//            perspectiveRenderer.reloadData();
+//            if (newValue.toString().length() < 4)
+//                labelObserverYAngle.setText(newValue.toString());
+//            else
+//                labelObserverYAngle.setText(newValue.toString().substring(0, 4));
+//        });
+//        sObserverZAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            Configuration.observer.zAngle = Math.toRadians(newValue.doubleValue());
+//            perspectiveRenderer.reloadData();
+//            if (newValue.toString().length() < 4)
+//                labelObserverZAngle.setText(newValue.toString());
+//            else
+//                labelObserverZAngle.setText(newValue.toString().substring(0, 4));
+//        });
+        chBPhong.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                perspectiveRenderer.usePhong(newValue);
         });
-        sObserverYAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Configuration.observer.yAngle = Math.toRadians(newValue.doubleValue());
-            perspectiveRenderer.reloadData();
-            if (newValue.toString().length() < 4)
-                labelObserverYAngle.setText(newValue.toString());
-            else
-                labelObserverYAngle.setText(newValue.toString().substring(0, 4));
-        });
-        sObserverZAngle.valueProperty().addListener((observable, oldValue, newValue) -> {
-            Configuration.observer.zAngle = Math.toRadians(newValue.doubleValue());
-            perspectiveRenderer.reloadData();
-            if (newValue.toString().length() < 4)
-                labelObserverZAngle.setText(newValue.toString());
-            else
-                labelObserverZAngle.setText(newValue.toString().substring(0, 4));
-        });
-
 
         tFLookAtX.setOnScroll(event -> {
                     if (event.getDeltaY() > 0)
@@ -498,6 +498,15 @@ public class MainController implements Initializable {
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
                 }
+        });
+        sKa.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Vertex3DModel.ka = newValue.doubleValue();
+        });
+        sKd.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Vertex3DModel.kd = newValue.doubleValue();
+        });
+        sKs.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Vertex3DModel.ks = newValue.doubleValue();
         });
 
         //CAMERA CONTROLS

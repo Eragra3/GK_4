@@ -16,9 +16,9 @@ public class Vertex3DModel extends Basic3DPoint {
     public double normY;
     public double normZ;
 
-    public double ks = 0.5;
-    public double kd = 0.5;
-    public double ka = 0.5;
+    public static double ks = 0.5;
+    public static double kd = 0.5;
+    public static double ka = 0.5;
 
     public Vertex3DModel(double x, double y, double z) {
         this.x = x;

@@ -78,21 +78,6 @@
                 <Label fx:id="labelLookAtZ"> </Label>
             </HBox>
             <HBox spacing="5">
-                <Label>Observer x rotation</Label>
-                <Slider fx:id="sObserverXAngle" min="0" max="360"></Slider>
-                <Label fx:id="labelObserverXAngle"> </Label>
-            </HBox>
-            <HBox spacing="5">
-                <Label>Observer y rotation</Label>
-                <Slider fx:id="sObserverYAngle" min="0" max="360"></Slider>
-                <Label fx:id="labelObserverYAngle"> </Label>
-            </HBox>
-            <HBox spacing="5">
-                <Label>Observer z rotation</Label>
-                <Slider fx:id="sObserverZAngle" min="0" max="360"></Slider>
-                <Label fx:id="labelObserverZAngle"> </Label>
-            </HBox>
-            <HBox spacing="5">
                 <Label>Light x</Label>
                 <TextField fx:id="tFLightX"></TextField>
                 <Label fx:id="labelLightX"> </Label>
@@ -106,6 +91,22 @@
                 <Label>Light z</Label>
                 <TextField fx:id="tFLightZ"></TextField>
                 <Label fx:id="labelLightZ"> </Label>
+            </HBox>
+            <HBox>
+                <Label>Phong</Label>
+                <CheckBox fx:id="chBPhong"></CheckBox>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Ks</Label>
+                <Slider fx:id="sKs" min="0" max="1"></Slider>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Kd</Label>
+                <Slider fx:id="sKd" min="0" max="1"></Slider>
+            </HBox>
+            <HBox spacing="5">
+                <Label>Ka</Label>
+                <Slider fx:id="sKa" min="0" max="1"></Slider>
             </HBox>
         </VBox>
     </HBox>

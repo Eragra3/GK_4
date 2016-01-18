@@ -20,9 +20,12 @@ public class Configuration {
 
     public final static PixelFormat pixelARGBFormat = PixelFormat.getIntArgbInstance();
 
-    private final static int OBSERVER_X = 0;
-    private final static int OBSERVER_Y = -200;
-    private final static int OBSERVER_Z = 200;
+//    private final static int OBSERVER_X = 0;
+//    private final static int OBSERVER_Y = -200;
+//    private final static int OBSERVER_Z = 200;
+    private final static int OBSERVER_X = -243;
+    private final static int OBSERVER_Y = -332;
+    private final static int OBSERVER_Z = 30;
     private final static double OBSERVER_FOV_X = 60.0;
     private final static double OBSERVER_FOV_Y = 60.0;
     private final static double OBSERVER_X_ANGLE = 0.0;
@@ -30,7 +33,9 @@ public class Configuration {
     private final static double OBSERVER_Z_ANGLE = 0.0;
     public static ObserverModel observer = new ObserverModel(OBSERVER_X, OBSERVER_Y, OBSERVER_Z, OBSERVER_FOV_X, OBSERVER_FOV_Y,
             OBSERVER_Y_ANGLE, OBSERVER_X_ANGLE, OBSERVER_Z_ANGLE);
-    public static LookAtModel lookAtPoint = new LookAtModel(0, -100, 100, 0, 0, 0);
+//    public static LookAtModel lookAtPoint = new LookAtModel(0, -100, 100, 0, 0, 0);
+    public static LookAtModel lookAtPoint = new LookAtModel(-62, -98, 231, 0, 0, 0);
+
 
     public static int ambientLightR = 20;
     public static int ambientLightG = 20;

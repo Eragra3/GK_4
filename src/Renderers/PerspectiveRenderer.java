@@ -38,6 +38,7 @@ public class PerspectiveRenderer implements IRenderer {
     LightSourceModel lightVector = new LightSourceModel();
     //
 
+    private boolean usePhong;
 
     public PerspectiveRenderer(ArrayList<Vertex3DModel> vertices, ArrayList<TriangleModel> triangles, PixelWriter pixelWriter) {
         this.vertices = vertices;
@@ -47,6 +48,10 @@ public class PerspectiveRenderer implements IRenderer {
 //        this.projectedVertices = new ArrayList<>(vertices.size());
 
         reloadData();
+    }
+
+    public void usePhong(boolean usePhong) {
+        this.usePhong = usePhong;
     }
 
     @Override
@@ -63,10 +68,10 @@ public class PerspectiveRenderer implements IRenderer {
         double x, x0, x1, y, y0, y1, u, v, dist;
         double dot00, dot01, dot02, dot11, dot12, invDenom;
         int tempI, tempJ;
-        int alpha, red, green, blue;
+        int alpha, red, green, blue, color;
         ColorModel aColor = new ColorModel(), bColor = new ColorModel(), cColor = new ColorModel();
         TriangleModel projectedTriangle;
-        Vertex3DModel workingPoint;
+        Vertex3DModel workingPoint, workingPointViewSpace;
 
         //bounding box
         double tlX;
@@ -80,12 +85,14 @@ public class PerspectiveRenderer implements IRenderer {
         for (TriangleModel model : triangles) {
             projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix);
 
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+            if (!usePhong) {
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+            }
 
             tlX = Helpers.min(projectedTriangle.a.x, projectedTriangle.b.x, projectedTriangle.c.x);
             tlY = Helpers.min(projectedTriangle.a.y, projectedTriangle.b.y, projectedTriangle.c.y);
@@ -131,7 +138,8 @@ public class PerspectiveRenderer implements IRenderer {
 
 //                            dist = projectedTriangle.a.z * t0 + projectedTriangle.b.z * t1 + projectedTriangle.c.z * (1 - t0 - t1);
                             workingPoint = CommonMethods.getVertexFromBarycentric(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
-                            dist = CommonMethods.projectVertex(workingPoint, projectionMatrix).z;
+                            workingPointViewSpace = CommonMethods.projectVertex(workingPoint, projectionMatrix);
+                            dist = workingPointViewSpace.z;
 //                            tempI = (int) (invProjectionResult.getEntry(0, 0) / invProjectionMatrix.getEntry(3, 0) +
 //                                    Configuration.IMAGE_WIDTH_HALF);
 //                            tempJ = -((int) (invProjectionResult.getEntry(1, 0) / invProjectionMatrix.getEntry(3, 0) +
@@ -141,16 +149,18 @@ public class PerspectiveRenderer implements IRenderer {
                             if (dist < zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI]) {
                                 zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI] = dist;
 
-
-                                //lighting
-//                                alpha = (int) (model.a.a * t0 + model.b.a * t1 + model.c.a * (1 - t0 - t1));
-                                alpha = 255;
-                                red = (int) (aColor.red * u + bColor.red * v + cColor.red * (1 - u - v));
-                                green = (int) (aColor.green * u + bColor.green * v + cColor.green * (1 - u - v));
-                                blue = (int) (aColor.blue * u + bColor.blue * v + cColor.blue * (1 - u - v));
+                                //shading
+                                if (usePhong) {
+//                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
+                                    CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                    color = aColor.getRGB();
+                                } else {
+                                    color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);
+                                }
                                 //
 
-                                pixelData[tempJ * Configuration.IMAGE_WIDTH + tempI] = (alpha << 24) + (red << 16) + (green << 8) + blue;
+                                pixelData[tempJ * Configuration.IMAGE_WIDTH + tempI] = color;
                             }
                         }
                     }

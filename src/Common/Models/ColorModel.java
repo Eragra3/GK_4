@@ -25,4 +25,8 @@ public class ColorModel {
     public ColorModel() {
 
     }
+
+    public int getRGB(){
+        return (alpha << 24) + (red << 16) + (green << 8) + blue;
+    }
 }
