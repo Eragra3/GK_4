@@ -50,11 +50,11 @@ public class OBJReader implements IOBJReader {
                             new Vertex3DModel(
                                     sc.nextDouble() * scale,
                                     sc.nextDouble() * scale,
-                                    sc.nextDouble() * scale
+                                    sc.nextDouble() * -scale
                             )
                     );
                 } else if (s.equals("vn")) {
-                    normalVectors.add(new Vector3DModel(sc.nextDouble(), sc.nextDouble(), sc.nextDouble()));
+                    normalVectors.add(new Vector3DModel(sc.nextDouble(), sc.nextDouble(), -sc.nextDouble()));
                 } else if (s.equals("f")) {
                     int vertexIndex1 = sc.nextInt();
                     int normalVectorIndex1 = (sc.nextInt() - 1) / 3;

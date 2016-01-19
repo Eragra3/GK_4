@@ -71,11 +71,11 @@ public class YOZRenderer implements IRenderer {
 
             if (!CommonMethods.usePhong) {
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerYOZ);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerYOZ);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerYOZ);
             }
 
             tl = new Point2D(Helpers.min(model.a.y, model.b.y, model.c.y), Helpers.min(model.a.z, model.b.z, model.c.z));
@@ -128,7 +128,7 @@ public class YOZRenderer implements IRenderer {
                                 if (CommonMethods.usePhong) {
 //                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
                                     CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
-                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerYOZ);
                                     color = aColor.getRGB();
                                 } else {
                                     color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);

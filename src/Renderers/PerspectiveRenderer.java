@@ -80,12 +80,12 @@ public class PerspectiveRenderer implements IRenderer {
             projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix);
 
             if (!CommonMethods.usePhong) {
-                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
-                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
-                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+                CommonMethods.calculateLighting(CommonMethods.projectVertexWithNormals(model.a, projectionMatrix, normalsProjectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observer);
+                CommonMethods.calculateLighting(CommonMethods.projectVertexWithNormals(model.b, projectionMatrix, normalsProjectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix, Configuration.observer);
+                CommonMethods.calculateLighting(CommonMethods.projectVertexWithNormals(model.c, projectionMatrix, normalsProjectionMatrix),normal, lightVector, observerVector,
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix, Configuration.observer);
             }
 
             tlX = Helpers.min(projectedTriangle.a.x, projectedTriangle.b.x, projectedTriangle.c.x);
@@ -149,7 +149,7 @@ public class PerspectiveRenderer implements IRenderer {
                                 if (CommonMethods.usePhong) {
 //                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
                                     CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
-                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observer);
                                     color = aColor.getRGB();
                                 } else {
                                     color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);

@@ -191,7 +191,7 @@ public class CommonMethods {
 
     public final static ColorModel calculateLighting(Vertex3DModel projectedVertex, Vector3DModel normal, LightSourceModel
             lightVector, Vector3DModel observerVector, Vector3DModel reflectionVector, ColorModel resultColor, RealMatrix
-                                                             normalsProjectionMatrix, RealMatrix projectionMatrix) {
+                                                             normalsProjectionMatrix, RealMatrix projectionMatrix, ObserverModel observer) {
         double red, green, blue;
         final int n = 100;
         normal.x = projectedVertex.normX;
@@ -205,10 +205,9 @@ public class CommonMethods {
         lightVector.z = lightVector.z - projectedVertex.z;
 
 
-        //observer is hardcoded at 0 0 0
-        observerVector.x = projectedVertex.x - Configuration.observer.x;
-        observerVector.y = projectedVertex.y - Configuration.observer.y;
-        observerVector.z = projectedVertex.z - Configuration.observer.z;
+        observerVector.x = projectedVertex.x - observer.x;
+        observerVector.y = projectedVertex.y - observer.y;
+        observerVector.z = projectedVertex.z - observer.z;
 
         //normalize
         lightVector.normalize();

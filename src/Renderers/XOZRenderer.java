@@ -70,11 +70,11 @@ public class XOZRenderer implements IRenderer {
 
             if (!CommonMethods.usePhong) {
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOZ);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOZ);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOZ);
             }
 
             tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.z, model.b.z, model.c.z));
@@ -116,7 +116,7 @@ public class XOZRenderer implements IRenderer {
 
                             workingPoint = CommonMethods.getVertexFromBarycentric(u, v, model.a, model.b, model.c);
                             workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint, projectionMatrix, normalsProjectionMatrix);
-
+//                            dist = workingPointViewSpace.z;
                             tempI = i + Configuration.IMAGE_WIDTH_HALF;
                             //JAVAFX y coordinate grows downwards, hence minus sign
                             tempJ = -j + Configuration.IMAGE_HEIGHT_HALF;
@@ -127,7 +127,7 @@ public class XOZRenderer implements IRenderer {
                                 if (CommonMethods.usePhong) {
 //                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
                                     CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
-                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOZ);
                                     color = aColor.getRGB();
                                 } else {
                                     color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);

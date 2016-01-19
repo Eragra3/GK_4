@@ -71,11 +71,11 @@ public class XOYRenderer implements IRenderer {
 
             if (!CommonMethods.usePhong) {
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOY);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOY);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOY);
             }
 
             tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.y, model.b.y, model.c.y));
@@ -112,13 +112,13 @@ public class XOYRenderer implements IRenderer {
                         if (u <= 0 || v <= 0 || u + v > 1) {
                             continue;
                         } else {
-                            dist = Math.abs(Configuration.observer.z - (model.a.z * u + model.b.z * v + model.c.z * (1 - u - v)));
+//                            dist = Math.abs(Configuration.observer.z - (model.a.z * u + model.b.z * v + model.c.z * (1 - u - v)));
 
                             workingPoint = CommonMethods.getVertexFromBarycentric(u, v, model.a, model.b, model.c);
-                            workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint, projectionMatrix, normalsProjectionMatrix);
-
-                            tempI = i + Configuration.IMAGE_WIDTH_HALF;
-                            //JAVAFX y coordinate grows downwards, hence minus sign
+                            workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint,
+                                    projectionMatrix, normalsProjectionMatrix);
+                            dist = workingPointViewSpace.z;
+                            tempI = i + Configuration.IMAGE_WIDTH_HALF;                            //JAVAFX y coordinate grows downwards, hence minus sign
                             tempJ = -j + Configuration.IMAGE_HEIGHT_HALF;
                             if (dist < zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI]) {
                                 zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI] = dist;
@@ -127,7 +127,7 @@ public class XOYRenderer implements IRenderer {
                                 if (CommonMethods.usePhong) {
 //                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
                                     CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
-                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix, Configuration.observerXOY);
                                     color = aColor.getRGB();
                                 } else {
                                     color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);

@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainController implements Initializable {
 
-    final private String MODEL_NAME = "house.obj";
+    final private String MODEL_NAME = "square.obj";
 
     @FXML
     Canvas cXOY;
