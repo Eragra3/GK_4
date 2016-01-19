@@ -52,7 +52,7 @@ public class XOYRenderer implements IRenderer {
         double x, x0, x1, y, y0, y1, u, v, dist;
         double dot00, dot01, dot02, dot11, dot12, invDenom;
         int tempI, tempJ;
-        int alpha, red, green, blue;
+        int alpha, red, green, blue, color;
         ColorModel aColor = new ColorModel(), bColor = new ColorModel(), cColor = new ColorModel();
 
         //bounding box
@@ -64,15 +64,19 @@ public class XOYRenderer implements IRenderer {
                 observerVector = new Vector3DModel(),
                 reflectionVector = new Vector3DModel();
         LightSourceModel lightVector = new LightSourceModel();
+        Vertex3DModel workingPointViewSpace, workingPoint;
         //
 
         for (TriangleModel model : triangles) {
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
-            CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
-                    reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+
+            if (!CommonMethods.usePhong) {
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, bColor, normalsProjectionMatrix, projectionMatrix);
+                CommonMethods.calculateLighting(CommonMethods.projectVertex(model.c, projectionMatrix), normal, lightVector, observerVector,
+                        reflectionVector, cColor, normalsProjectionMatrix, projectionMatrix);
+            }
 
             tl = new Point2D(Helpers.min(model.a.x, model.b.x, model.c.x), Helpers.min(model.a.y, model.b.y, model.c.y));
             br = new Point2D(Helpers.max(model.a.x, model.b.x, model.c.x), Helpers.max(model.a.y, model.b.y, model.c.y));
@@ -108,24 +112,29 @@ public class XOYRenderer implements IRenderer {
                         if (u <= 0 || v <= 0 || u + v > 1) {
                             continue;
                         } else {
-                            dist = Math.abs(Configuration.observer.z - (model.a.z * u + model.b.z * v + model.c.z * (1 - u -
-                                    v)));
+                            dist = Math.abs(Configuration.observer.z - (model.a.z * u + model.b.z * v + model.c.z * (1 - u - v)));
+
+                            workingPoint = CommonMethods.getVertexFromBarycentric(u, v, model.a, model.b, model.c);
+                            workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint, projectionMatrix, normalsProjectionMatrix);
+
                             tempI = i + Configuration.IMAGE_WIDTH_HALF;
                             //JAVAFX y coordinate grows downwards, hence minus sign
                             tempJ = -j + Configuration.IMAGE_HEIGHT_HALF;
                             if (dist < zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI]) {
                                 zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI] = dist;
 
-
-                                //lighting
-//                                alpha = (int) (model.a.a * t0 + model.b.a * t1 + model.c.a * (1 - t0 - t1));
-                                alpha = 255;
-                                red = (int) (aColor.red * u + bColor.red * v + cColor.red * (1 - u - v));
-                                green = (int) (aColor.green * u + bColor.green * v + cColor.green * (1 - u - v));
-                                blue = (int) (aColor.blue * u + bColor.blue * v + cColor.blue * (1 - u - v));
+                                //shading
+                                if (CommonMethods.usePhong) {
+//                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
+                                    CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
+                                            reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
+                                    color = aColor.getRGB();
+                                } else {
+                                    color = CommonMethods.GouradShading(aColor, bColor, cColor, u, v);
+                                }
                                 //
 
-                                pixelData[tempJ * Configuration.IMAGE_WIDTH + tempI] = (alpha << 24) + (red << 16) + (green << 8) + blue;
+                                pixelData[tempJ * Configuration.IMAGE_WIDTH + tempI] = color;
                             }
                         }
                     }

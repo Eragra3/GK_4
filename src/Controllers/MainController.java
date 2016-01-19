@@ -4,10 +4,7 @@ import Common.Configuration;
 import Common.Models.*;
 import OBJReader.OBJReader;
 import OBJReader.OBJResponse;
-import Renderers.PerspectiveRenderer;
-import Renderers.XOYRenderer;
-import Renderers.XOZRenderer;
-import Renderers.YOZRenderer;
+import Renderers.*;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
@@ -439,7 +436,7 @@ public class MainController implements Initializable {
 //                labelObserverZAngle.setText(newValue.toString().substring(0, 4));
 //        });
         chBPhong.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                perspectiveRenderer.usePhong(newValue);
+                CommonMethods.usePhong = newValue;
         });
 
         tFLookAtX.setOnScroll(event -> {

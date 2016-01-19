@@ -11,6 +11,8 @@ import org.apache.commons.math3.linear.RealMatrix;
 public class CommonMethods {
 
 
+    public static boolean usePhong;
+
     public final static LightSourceModel projectLightSource(LightSourceModel lightSourceModel, RealMatrix projectionMatrix) {
         RealMatrix projectionResult;
 
@@ -103,6 +105,40 @@ public class CommonMethods {
         resultVertex.normX = vertex.normX;
         resultVertex.normY = vertex.normY;
         resultVertex.normZ = vertex.normZ;
+        return resultVertex;
+    }
+
+    public final static Vertex3DModel projectVertexWithNormals(Vertex3DModel vertex, RealMatrix projectionMatrix, RealMatrix normalProjectionMatrix) {
+        RealMatrix projectionResult;
+
+        projectionResult = projectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
+                {
+                        {vertex.x},
+                        {vertex.y},
+                        {vertex.z},
+                        {1}
+                }
+        ));
+
+        Vertex3DModel resultVertex;
+
+        resultVertex = new Vertex3DModel(
+                projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0),
+                projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0),
+                projectionResult.getEntry(2, 0)
+        );
+
+        projectionResult = normalProjectionMatrix.multiply(new Array2DRowRealMatrix(new double[][]
+                {
+                        {vertex.normX},
+                        {vertex.normY},
+                        {vertex.normZ},
+                        {1}
+                }
+        ));
+        resultVertex.normX = projectionResult.getEntry(0, 0) / projectionResult.getEntry(3, 0);
+        resultVertex.normY = projectionResult.getEntry(1, 0) / projectionResult.getEntry(3, 0);
+        resultVertex.normZ = projectionResult.getEntry(2, 0) / projectionResult.getEntry(3, 0);
         return resultVertex;
     }
 

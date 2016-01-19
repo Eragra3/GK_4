@@ -38,8 +38,6 @@ public class PerspectiveRenderer implements IRenderer {
     LightSourceModel lightVector = new LightSourceModel();
     //
 
-    private boolean usePhong;
-
     public PerspectiveRenderer(ArrayList<Vertex3DModel> vertices, ArrayList<TriangleModel> triangles, PixelWriter pixelWriter) {
         this.vertices = vertices;
         this.triangles = triangles;
@@ -48,10 +46,6 @@ public class PerspectiveRenderer implements IRenderer {
 //        this.projectedVertices = new ArrayList<>(vertices.size());
 
         reloadData();
-    }
-
-    public void usePhong(boolean usePhong) {
-        this.usePhong = usePhong;
     }
 
     @Override
@@ -85,7 +79,7 @@ public class PerspectiveRenderer implements IRenderer {
         for (TriangleModel model : triangles) {
             projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix);
 
-            if (!usePhong) {
+            if (!CommonMethods.usePhong) {
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.a, projectionMatrix), normal, lightVector, observerVector,
                         reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
                 CommonMethods.calculateLighting(CommonMethods.projectVertex(model.b, projectionMatrix), normal, lightVector, observerVector,
@@ -138,7 +132,9 @@ public class PerspectiveRenderer implements IRenderer {
 
 //                            dist = projectedTriangle.a.z * t0 + projectedTriangle.b.z * t1 + projectedTriangle.c.z * (1 - t0 - t1);
                             workingPoint = CommonMethods.getVertexFromBarycentric(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
-                            workingPointViewSpace = CommonMethods.projectVertex(workingPoint, projectionMatrix);
+
+                            workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint, projectionMatrix, normalsProjectionMatrix);
+
                             dist = workingPointViewSpace.z;
 //                            tempI = (int) (invProjectionResult.getEntry(0, 0) / invProjectionMatrix.getEntry(3, 0) +
 //                                    Configuration.IMAGE_WIDTH_HALF);
@@ -150,7 +146,7 @@ public class PerspectiveRenderer implements IRenderer {
                                 zBuffer[tempJ * Configuration.IMAGE_WIDTH + tempI] = dist;
 
                                 //shading
-                                if (usePhong) {
+                                if (CommonMethods.usePhong) {
 //                                    color = CommonMethods.PhongShading(aColor, bColor, cColor, u, v);
                                     CommonMethods.calculateLighting(workingPointViewSpace, normal, lightVector, observerVector,
                                             reflectionVector, aColor, normalsProjectionMatrix, projectionMatrix);
