@@ -50,7 +50,7 @@ public class Configuration {
     public static int ambientLightR = 20;
     public static int ambientLightG = 20;
     public static int ambientLightB = 20;
-    public static LightSourceModel lightSource = new LightSourceModel(100, -100, 150, 200, 200, 200);
+    public static LightSourceModel lightSource = new LightSourceModel(100, -100, 150, 255, 255, 255);
 
     public static final int SYSTEM_X = 0;
     public static final int SYSTEM_Y = 0;

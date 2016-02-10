@@ -108,7 +108,7 @@ public class XOZRenderer implements IRenderer {
                         v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
 
-                        if (u <= 0 || v <= 0 || u + v > 1) {
+                        if (u <= -0.05 || v <= -0.05 || u + v > 1.1) {
                             continue;
                         } else {
 //                            dist = Math.abs(Configuration.observer.z - (model.a.z * u + model.b.z * v + model.c.z * (1 - u - v)));

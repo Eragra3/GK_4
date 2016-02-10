@@ -27,6 +27,9 @@ public class MainController implements Initializable {
 
     final private String MODEL_NAME = "sphere_above.obj";
 
+
+    private static boolean reloadData = false;
+
     @FXML
     Canvas cXOY;
     @FXML
@@ -212,6 +215,10 @@ public class MainController implements Initializable {
                 xozRenderer.render();
                 yozRenderer.render();
                 perspectiveRenderer.render();
+                if (reloadData) {
+                    perspectiveRenderer.reloadData();
+                    reloadData = false;
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -284,7 +291,7 @@ public class MainController implements Initializable {
         });
         sFOVX.valueProperty().addListener((observable, oldValue, newValue) -> {
             Configuration.observer.fovX = newValue.doubleValue();
-            perspectiveRenderer.reloadData();
+            reloadData = true;
             if (newValue.toString().length() < 4)
                 labelAngleX.setText(newValue.toString());
             else
@@ -292,7 +299,7 @@ public class MainController implements Initializable {
         });
         sFOVY.valueProperty().addListener((observable, oldValue, newValue) -> {
             Configuration.observer.fovY = newValue.doubleValue();
-            perspectiveRenderer.reloadData();
+            reloadData = true;
             if (newValue.toString().length() < 4)
                 labelAngleY.setText(newValue.toString());
             else
@@ -311,7 +318,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.observer.x = value;
                     labelObserverX.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -330,7 +337,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.observer.y = value;
                     labelObserverY.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -349,7 +356,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.observer.z = value;
                     labelObserverZ.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -368,7 +375,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lightSource.x = value;
                     labelLightX.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -387,7 +394,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lightSource.y = value;
                     labelLightY.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -406,7 +413,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lightSource.z = value;
                     labelLightZ.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -453,7 +460,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lookAtPoint.x = value;
                     labelLookAtX.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -472,7 +479,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lookAtPoint.y = value;
                     labelLookAtY.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
@@ -491,7 +498,7 @@ public class MainController implements Initializable {
                     double value = Double.parseDouble(newValue.replace(",", "."));
                     Configuration.lookAtPoint.z = value;
                     labelLookAtZ.setText(String.valueOf(value));
-                    perspectiveRenderer.reloadData();
+                    reloadData = true;
                     renderOverlays();
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Input is incorrect");
