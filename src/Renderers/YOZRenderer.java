@@ -151,9 +151,9 @@ public class YOZRenderer implements IRenderer {
                         {Configuration.IMAGE_WIDTH, 0, 0, 0},
                         {0, Configuration.IMAGE_HEIGHT, 0, 0},
                         {0, 0,
-                                -((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
-                                -((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))},
-                        {0, 0, -1, 1}
+                                ((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
+                                ((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))},
+                        {0, 0, 1, 1}
                 }
         );
         invProjectionMatrix = MatrixUtils.inverse(projectionMatrix);

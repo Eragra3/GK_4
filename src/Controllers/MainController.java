@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainController implements Initializable {
 
-    final private String MODEL_NAME = "sphere.obj";
+    final private String MODEL_NAME = "sphere_above.obj";
 
     @FXML
     Canvas cXOY;
@@ -215,7 +215,7 @@ public class MainController implements Initializable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 1000, 100, TimeUnit.MILLISECONDS);
+        }, 1000, 25, TimeUnit.MILLISECONDS);
 //        Timer timer = new Timer("Main Timer", true);
 //        TimerTask renderersTask = new TimerTask() {
 //            @Override
@@ -259,6 +259,7 @@ public class MainController implements Initializable {
         pwAxisYOZ = cYOZAxis.getGraphicsContext2D().getPixelWriter();
 
         pwAxisCamera = cCameraAxis.getGraphicsContext2D().getPixelWriter();
+        cCameraAxis.getGraphicsContext2D().setStroke(Color.WHITE);
         cCameraAxis.getGraphicsContext2D().strokeText("Perspective", 10, 10);
 //        cCameraAxis.getGraphicsContext2D().strokeText("X", 205, 15);
 //        cCameraAxis.getGraphicsContext2D().strokeText("Y", 390, 215);

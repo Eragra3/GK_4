@@ -142,16 +142,17 @@ public class CommonMethods {
         return resultVertex;
     }
 
-    public final static TriangleModel projectTriangle(TriangleModel triangle, RealMatrix projectionMatrix) {
+    public final static TriangleModel projectTriangle(TriangleModel triangle, RealMatrix projectionMatrix,
+                                                      RealMatrix normalsProjectionMatrix) {
         TriangleModel projectedTriangle;
 
         projectedTriangle = new TriangleModel(
                 projectVertex(triangle.a, projectionMatrix),
                 projectVertex(triangle.b, projectionMatrix),
                 projectVertex(triangle.c, projectionMatrix),
-                triangle.aNorm,
-                triangle.bNorm,
-                triangle.cNorm
+                projectNormal(triangle.aNorm, normalsProjectionMatrix),
+                projectNormal(triangle.bNorm, normalsProjectionMatrix),
+                projectNormal(triangle.cNorm, normalsProjectionMatrix)
         );
 
         return projectedTriangle;
@@ -186,6 +187,21 @@ public class CommonMethods {
                 a.y * u + b.y * v + c.y * (1 - u - v),
                 a.z * u + b.z * v + c.z * (1 - u - v)
         );
+//        workingPoint.normX = a.normX * u + b.normX * v + c.normX * (1 - u - v);
+//        workingPoint.normY = a.normY * u + b.normY * v + c.normY * (1 - u - v);
+//        workingPoint.normZ = a.normZ * u + b.normZ * v + c.normZ * (1 - u - v);
+        return workingPoint;
+    }
+
+    public final static Vertex3DModel getVertexFromBarycentricWithNormals(double u, double v, Vertex3DModel a, Vertex3DModel b, Vertex3DModel c) {
+        Vertex3DModel workingPoint = new Vertex3DModel(
+                a.x * u + b.x * v + c.x * (1 - u - v),
+                a.y * u + b.y * v + c.y * (1 - u - v),
+                a.z * u + b.z * v + c.z * (1 - u - v)
+        );
+        workingPoint.normX = a.normX * u + b.normX * v + c.normX * (1 - u - v);
+        workingPoint.normY = a.normY * u + b.normY * v + c.normY * (1 - u - v);
+        workingPoint.normZ = a.normZ * u + b.normZ * v + c.normZ * (1 - u - v);
         return workingPoint;
     }
 

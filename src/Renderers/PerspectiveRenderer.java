@@ -77,7 +77,7 @@ public class PerspectiveRenderer implements IRenderer {
         RealMatrix invProjectionResult;
 
         for (TriangleModel model : triangles) {
-            projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix);
+            projectedTriangle = CommonMethods.projectTriangle(model, projectionMatrix, normalsProjectionMatrix);
 
             if (!CommonMethods.usePhong) {
                 CommonMethods.calculateLighting(CommonMethods.projectVertexWithNormals(model.a, projectionMatrix, normalsProjectionMatrix), normal, lightVector, observerVector,
@@ -131,7 +131,7 @@ public class PerspectiveRenderer implements IRenderer {
 //                            ));
 
 //                            dist = projectedTriangle.a.z * t0 + projectedTriangle.b.z * t1 + projectedTriangle.c.z * (1 - t0 - t1);
-                            workingPoint = CommonMethods.getVertexFromBarycentric(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
+                            workingPoint = CommonMethods.getVertexFromBarycentricWithNormals(u, v, projectedTriangle.a, projectedTriangle.b, projectedTriangle.c);
 
                             workingPointViewSpace = CommonMethods.projectVertexWithNormals(workingPoint, projectionMatrix, normalsProjectionMatrix);
 
