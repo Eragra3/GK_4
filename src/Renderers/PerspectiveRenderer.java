@@ -197,8 +197,8 @@ public class PerspectiveRenderer implements IRenderer {
                         {
                                 0,
                                 0,
-                                -((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
-                                -((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))
+                                ((Configuration.FAR_Z + Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z)),
+                                ((2 * Configuration.FAR_Z * Configuration.NEAR_Z) / (Configuration.FAR_Z - Configuration.NEAR_Z))
                         },
                         {0, 0, 1, 1}
                 }
@@ -302,7 +302,7 @@ public class PerspectiveRenderer implements IRenderer {
         projectionMatrix = projectionMatrix.multiply(translationM);
         projectionMatrix = projectionMatrix.multiply(yRotationM);
         projectionMatrix = projectionMatrix.multiply(xRotationM);
-        projectionMatrix = projectionMatrix.multiply(zRotationM);
+//        projectionMatrix = projectionMatrix.multiply(zRotationM);
 
 //        projectionMatrix = projectionMatrix.multiply(new Array2DRowRealMatrix (new double[][] {
 //                {1, 0, 0, 0},

@@ -13,7 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Label;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
-import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 import javax.swing.*;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MainController implements Initializable {
 
-    final private String MODEL_NAME = "square.obj";
+    final private String MODEL_NAME = "sphere.obj";
 
     @FXML
     Canvas cXOY;
@@ -208,10 +208,10 @@ public class MainController implements Initializable {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(() -> {
             try {
-            xoyRenderer.render();
-            xozRenderer.render();
-            yozRenderer.render();
-            perspectiveRenderer.render();
+                xoyRenderer.render();
+                xozRenderer.render();
+                yozRenderer.render();
+                perspectiveRenderer.render();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -436,7 +436,7 @@ public class MainController implements Initializable {
 //                labelObserverZAngle.setText(newValue.toString().substring(0, 4));
 //        });
         chBPhong.selectedProperty().addListener((observable, oldValue, newValue) -> {
-                CommonMethods.usePhong = newValue;
+            CommonMethods.usePhong = newValue;
         });
 
         tFLookAtX.setOnScroll(event -> {
@@ -507,13 +507,40 @@ public class MainController implements Initializable {
         });
 
         //CAMERA CONTROLS
-        cXOYAxis.addEventFilter(MouseDragEvent.ANY, event -> {
-            double initialX;
-            if (event.getEventType() == MouseDragEvent.MOUSE_DRAG_ENTERED) {
-                initialX = event.getX();
-            } else if (event.getEventType() == MouseDragEvent.MOUSE_DRAG_EXITED) {
-                //todo
-//                tFLookAtX.setText(String.valueOf(initialX - event.getX()));
+        cXOYAxis.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            if (event.isPrimaryButtonDown()) {
+                tFObserverX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFObserverY.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isSecondaryButtonDown()) {
+                tFLookAtX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLookAtY.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isMiddleButtonDown()) {
+                tFLightX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLightY.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            }
+        });
+        cXOZAxis.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            if (event.isPrimaryButtonDown()) {
+                tFObserverX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFObserverZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isSecondaryButtonDown()) {
+                tFLookAtX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLookAtZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isMiddleButtonDown()) {
+                tFLightX.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLightZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            }
+        });
+        cYOZAxis.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            if (event.isPrimaryButtonDown()) {
+                tFObserverY.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFObserverZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isSecondaryButtonDown()) {
+                tFLookAtY.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLookAtZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
+            } else if (event.isMiddleButtonDown()) {
+                tFLightY.setText(String.valueOf(event.getX() - Configuration.IMAGE_WIDTH / 2));
+                tFLightZ.setText(String.valueOf(-event.getY() + Configuration.IMAGE_HEIGHT / 2));
             }
         });
     }

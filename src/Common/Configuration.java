@@ -50,7 +50,7 @@ public class Configuration {
     public static int ambientLightR = 20;
     public static int ambientLightG = 20;
     public static int ambientLightB = 20;
-    public static LightSourceModel lightSource = new LightSourceModel(0, -120, 75, 200, 200, 200);
+    public static LightSourceModel lightSource = new LightSourceModel(100, -100, 150, 200, 200, 200);
 
     public static final int SYSTEM_X = 0;
     public static final int SYSTEM_Y = 0;
@@ -60,5 +60,5 @@ public class Configuration {
     public static final byte BACKGROUND_G = 127;
     public static final byte BACKGROUND_B = 127;
 
-    public static final double objectScale = 100.0;
+    public static final double objectScale = 5.0;
 }
